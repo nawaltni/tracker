@@ -2,21 +2,19 @@ package postgres
 
 import (
 	"github.com/nawaltni/tracker/domain"
-
 	"github.com/paulmach/orb"
 )
 
 // ToModelUserPosition converts a domain UserPosition to a postgres UserPosition.
 func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 	up := UserPosition{
-		UserID:       in.UserID,
-		Latitude:     in.Location.Latitude,
-		Longitude:    in.Location.Longitude,
-		Timestamp:    in.CreatedAt,
-		PlaceID:      in.PlaceID,
-		CheckedInAt:  in.CheckedInAt,
-		CheckedOutAt: in.CheckedOutAt,
-		Location:     orb.Point{in.Location.Longitude, in.Location.Latitude},
+		UserID:     in.UserID,
+		Latitude:   in.Location.Latitude,
+		Longitude:  in.Location.Longitude,
+		CreatedAt:  in.CreatedAt,
+		PlaceID:    in.PlaceID,
+		CheckedIn:  in.CheckedIn,
+		CheckedOut: in.CheckedOut,
 		PhoneMetadata: PhoneMetadata{
 			DeviceID:    in.Metadata.DeviceID,
 			Model:       in.Metadata.Model,
@@ -25,15 +23,20 @@ func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 			CorporateID: in.Metadata.CorporateID,
 		},
 	}
+
+	point := orb.Point{in.Location.Longitude, in.Location.Latitude}
+
+	// point := geom.NewPoint(geom.XY).MustSetCoords(geom.Coord{in.Location.Longitude, in.Location.Latitude}).SetSRID(4326)
+	up.Location = GeoPoint{Point: point}
 	return up
 }
 
 // ToDomainUserPosition converts a postgres UserPosition to a domain UserPosition.
-func ToDomainUserPosition(in *UserPosition) *domain.UserPosition {
+func ToDomainUserPosition(in UserPosition) *domain.UserPosition {
 	domainUP := &domain.UserPosition{
 		UserID:    in.UserID,
 		Location:  domain.GeoPoint{Latitude: in.Latitude, Longitude: in.Longitude},
-		CreatedAt: in.Timestamp,
+		CreatedAt: in.CreatedAt,
 		PlaceID:   in.PlaceID,
 		Metadata: domain.PhoneMetadata{
 			DeviceID:    in.PhoneMetadata.DeviceID,
@@ -44,11 +47,11 @@ func ToDomainUserPosition(in *UserPosition) *domain.UserPosition {
 		},
 	}
 	// Conditional assignment for optional fields
-	if in.CheckedInAt != nil {
-		domainUP.CheckedInAt = in.CheckedInAt
+	if in.CheckedIn != nil {
+		domainUP.CheckedIn = in.CheckedIn
 	}
-	if in.CheckedOutAt != nil {
-		domainUP.CheckedOutAt = in.CheckedOutAt
+	if in.CheckedOut != nil {
+		domainUP.CheckedOut = in.CheckedOut
 	}
 	// If you have a PlaceName field in the model, you would convert it here as well.
 	return domainUP

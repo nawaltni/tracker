@@ -1,6 +1,10 @@
 package postgres
 
-import "github.com/nawaltni/tracker/domain"
+import (
+	"fmt"
+
+	"github.com/nawaltni/tracker/domain"
+)
 
 // UserPositionRepository is the GORM implementation of the UserPositionRepository.
 type UserPositionRepository struct {
@@ -14,7 +18,13 @@ func NewUserPositionRepository(client *Client) *UserPositionRepository {
 
 // Insert adds a new UserPosition to the database.
 func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error {
-	return r.client.db.Create(userPosition).Error
+	model := ToModelUserPosition(userPosition)
+	err := r.client.db.Create(&model).Error
+	if err != nil {
+		return fmt.Errorf("error inserting user position: %w", err)
+	}
+	*userPosition = *ToDomainUserPosition(model)
+	return nil
 }
 
 // GetUserPosition retrieves a user's most recent position from the database.

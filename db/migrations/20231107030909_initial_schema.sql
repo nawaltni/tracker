@@ -14,7 +14,7 @@ CREATE TABLE user_positions (
     checked_in TIMESTAMP WITH TIME ZONE,
     checked_out TIMESTAMP WITH TIME ZONE,
     -- PostGIS geographical point for location (latitude and longitude)
-    location GEOGRAPHY(Point, 4326)
+    location GEOMETRY(Point, 4326)
 );
 -- Create indexes for user_id and timestamp
 CREATE INDEX idx_user_positions_user_id ON user_positions (user_id);
