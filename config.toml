@@ -1,0 +1,15 @@
+# FILEPATH: /Users/reneval/Development/nawaltni/places/config.toml
+
+environment = "development"
+
+[postgres]
+host = "localhost"
+port = 5432
+database = "places"
+user = "postgres"
+password = "postgres"
+run_migrations = true
+
+[grpc]
+host = "127.0.0.1"
+port = 50051

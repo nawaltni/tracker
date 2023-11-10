@@ -2,8 +2,13 @@ package postgres
 
 import (
 	"fmt"
+	"log"
+	"net/url"
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/amacneil/dbmate/v2/pkg/dbmate"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -15,10 +20,10 @@ type Client struct {
 }
 
 // NewClient starts a connection with db using gorm.
-func NewClient(user, password, host string, port int, dbname string) (*Client, error) {
+func NewClient(host string, port int, user, password, dbname string) (*Client, error) {
 	// Connection string
-	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		host, user, password, dbname, port)
+	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s  sslmode=disable",
+		host, port, user, password, dbname)
 
 	db, err := gorm.Open(postgres.Open(connString))
 	if err != nil {
@@ -52,4 +57,50 @@ func NewClient(user, password, host string, port int, dbname string) (*Client, e
 	}
 
 	return client, nil
+}
+
+// Repositories contains all repositories of the application
+type Repositories struct {
+	Places *UserPositionRepository
+}
+
+// NewRepositories creates new repositories
+func NewRepositories(client *Client) (*Repositories, error) {
+	repos := &Repositories{
+		Places: NewUserPositionRepository(client),
+	}
+
+	return repos, nil
+}
+
+// MigrateUp runs migrations
+func MigrateUp(host string, port int, user, password, dbname string) error {
+	// Connection string
+	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		user, password, host, port, dbname)
+
+	u, _ := url.Parse(connString)
+	dbm := dbmate.New(u)
+
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	currentFolder := filepath.Base(dir)
+
+	configPath := dir + "/db/migrations"
+	if currentFolder == "nawaltni" {
+		configPath = dir + "/places/db/migrations"
+	}
+
+	dbm.MigrationsDir = []string{configPath}
+	err = dbm.CreateAndMigrate()
+	if err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+
+	log.Printf("Migrations ran successfully")
+
+	return nil
 }

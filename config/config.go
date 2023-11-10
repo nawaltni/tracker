@@ -9,17 +9,19 @@ import (
 
 // Configuration represents the application configuration
 type Configuration struct {
-	Database struct {
-		Username string
-		Password string
-		DBName   string
-		Host     string
-		Port     int
+	Environment string `mapstructure:"environment"`
+	Postgres    struct {
+		Host          string `mapstructure:"host"`
+		Port          int    `mapstructure:"port"`
+		Username      string `mapstructure:"user"`
+		Password      string `mapstructure:"password"`
+		Database      string `mapstructure:"database"`
+		RunMigrations bool   `mapstructure:"run_migrations"`
 	}
 	GRPC struct {
-		Host string
-		Port int
-	}
+		Host string `mapstructure:"host"`
+		Port int    `mapstructure:"port"`
+	} `mapstructure:"grpc"`
 }
 
 // LoadConfig loads the configuration from file and environment variables

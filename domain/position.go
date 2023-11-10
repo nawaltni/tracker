@@ -21,3 +21,6 @@ type UserPositionRepository interface {
 	GetUserPosition(userID string) (*UserPosition, error)
 	GetUsersPositionByCoordinates(lat float64, lon float64) ([]UserPosition, error)
 }
+
+// UserPositionService defines the interface for the user position service.
+type UserPositionService interface{}

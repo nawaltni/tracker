@@ -5,16 +5,23 @@ import (
 	"log"
 
 	"github.com/nawaltni/tracker/config"
+	"github.com/nawaltni/tracker/grpc"
+	"github.com/nawaltni/tracker/postgres"
+	"github.com/nawaltni/tracker/services"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "places",
-	Short: "Places is the service that manages places data",
+	Use:   "tracker",
+	Short: "Tracker is the service that manages tracker data",
 	Run:   run,
 }
 
 func RootCommand() *cobra.Command {
+	// main flags
+	rootCmd.Flags().IntP("port", "p", 8080, "Set the port to run the app")
+	rootCmd.Flags().StringP("config", "c", "config.toml", "Set the config file to use")
 	return rootCmd
 }
 
@@ -23,106 +30,53 @@ func run(cmd *cobra.Command, args []string) {
 	conf, err := config.LoadConfig(cmd)
 	if err != nil {
 		log.Fatal("Failed to load config: " + err.Error())
+		return
 	}
 
-	fmt.Println(conf)
+	pConfig := conf.Postgres
+	fmt.Printf("config: %+v\n", conf)
 
-	// // 2. Create logger instance
-	// logger, err := config.NewZeroLog("debug", conf.Environment)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not config logger")
-	// }
+	// 2. Create Postgres Client
+	pgClient, err := postgres.NewClient(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database)
+	if err != nil {
+		log.Fatal("Failed to create postgres client: " + err.Error())
+		return
+	}
 
-	// // 3. Create BigQuery Client
-	// bqClient, err := bigquery.NewClient(conf.BigQuery, logger)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not establish connection to BigQuery after 10 tries.")
-	// }
+	// 3. Migration
+	if pConfig.RunMigrations {
+		err = postgres.MigrateUp(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database)
+		if err != nil {
+			log.Fatal("Failed to run migrations: " + err.Error())
+			return
+		}
+	}
 
-	// // 3. Create CBS Client
-	// cbsClient, err := cbs.NewCBSClient(conf.CBS)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not establish connection to cbs.")
-	// }
+	// 3. Create Repositories
+	repost, err := postgres.NewRepositories(pgClient)
+	if err != nil {
+		log.Fatal("Failed to create postgres repositories: " + err.Error())
+		return
 
-	// recaptchaClient, err := recaptcha.NewClient(conf.Recaptcha2.Secret, *logger)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not connect to reCAPTCHA v2")
-	// 	panic(err)
-	// }
+	}
 
-	// recaptchaV3Client, err := recaptcha.NewClient(conf.Recaptcha3.Secret, *logger)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not connect to reCAPTCHA v3")
-	// 	panic(err)
-	// }
+	// 4. Create Services
+	services, err := services.NewServices(*conf, repost)
+	if err != nil {
+		log.Fatal("Failed to create services: " + err.Error())
+		return
+	}
 
-	// // 4. Setup encoder
+	// 5. Start gRPC Service
+	server, err := grpc.New(*conf, services)
+	if err != nil {
+		log.Fatal("Failed to create grpc server: " + err.Error())
+		return
+	}
 
-	// encoder, err := urldecoder.NewCryptoAES(conf.URLEncoding.Key, conf.URLEncoding.Num)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not start AES encoder")
-	// 	return
-	// }
-
-	// // 5. Setup URL Generator
-	// urlEncoder := urldecoder.NewURLBuilder(conf.URLEncoding.Host, conf.URLEncoding.Scheme, encoder)
-
-	// // 6.
-	// ipRegistryClient := ipregistry.NewIPRegistryHandler(conf.IPRegistry)
-
-	// // 7
-	// redisCacher := redis.NewCache(*conf)
-
-	// // 8 Create router evaluator
-
-	// rEvaluator := rules.NewRuleRoutingManager(conf.ExpiredClickOffset)
-
-	// // 9. Create Kafka Client
-
-	// var opts []kafka.ClientOptionFunc
-	// if conf.Kafka.Auth {
-	// 	opts = append(opts, kafka.SASLPlain(conf.Kafka.Key, conf.Kafka.Secret))
-	// }
-
-	// if conf.Kafka.SSL {
-	// 	opts = append(opts, kafka.DefaultSSL())
-	// }
-
-	// kafkaClient, err := kafka.NewClient(conf.Kafka.Address, opts...)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "Could not start kafka client")
-	// 	return
-	// }
-
-	// // 10. Create backend requests helper
-	// backendClient := httpclient.NewBackendClient(&http.Client{}, conf, logger)
-
-	// // 11. Prepare Services, injecting dependencies.
-	// svcs := services.NewServices(
-	// 	logger, *conf, bqClient, recaptchaClient, recaptchaV3Client, cbsClient,
-	// 	urlEncoder, ipRegistryClient, redisCacher, rEvaluator, kafkaClient, backendClient,
-	// )
-
-	// // 12. Create a API Service
-	// apiSVC := api.New(logger, conf, svcs)
-
-	// // 14. Prepare gRPC Server
-	// srvGRPC, err := grpco.New(*conf, svcs, *logger)
-	// if err != nil {
-	// 	logger.FatalGCP(err, "could not create grpc server")
-	// 	return
-	// }
-
-	// go func() {
-	// 	// 15. Start gRPC Service
-	// 	err = srvGRPC.Start()
-	// 	if err != nil {
-	// 		logger.FatalGCP(err, "could not start grpc server")
-	// 		return
-	// 	}
-	// }()
-
-	// // 13. Execute services
-	// apiSVC.Start()
+	// 19. Start gRPC Service
+	err = server.Start()
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "Could not start grpc server"))
+	}
 }
