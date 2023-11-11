@@ -263,8 +263,8 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		lat      float64
-		lon      float64
+		lat      float32
+		lon      float32
 		distance int
 	}
 	tests := []struct {

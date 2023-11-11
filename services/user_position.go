@@ -39,6 +39,6 @@ func (s *UserPositionService) GetUserPosition(ctx context.Context, userID string
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
-func (s *UserPositionService) GetUsersPositionByCoordinates(ctx context.Context, lat, long float64, distance int) ([]domain.UserPosition, error) {
+func (s *UserPositionService) GetUsersPositionByCoordinates(ctx context.Context, lat, long float32, distance int) ([]domain.UserPosition, error) {
 	return s.repo.GetUsersPositionByCoordinates(ctx, lat, long, distance)
 }

@@ -46,7 +46,7 @@ func (r *UserPositionRepository) GetUserPosition(ctx context.Context, userID str
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
-func (r *UserPositionRepository) GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]domain.UserPosition, error) {
+func (r *UserPositionRepository) GetUsersPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]domain.UserPosition, error) {
 	var userPositions []UserPosition
 	// This will require raw SQL to utilize PostGIS functions.
 	// You need to adjust the SQL query to your needs (e.g., distance).

@@ -203,6 +203,10 @@ github.com/moby/term v0.5.0/go.mod h1:8FzsFHVUBGZdbDsJw/ot+X+d5HLUbvklYLJ9uGfcI3
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231107025256-a9d21437c012 h1:iJNFy0TQzAHt/hwLvx6hiXkyBT/4NAajHQKir35qgdg=
 github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231107025256-a9d21437c012/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231111042244-0308308c2501 h1:+gtO1Ni8C+6KhuqCip1dTKsuuJLONOqlj1Vx0beX8sk=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231111042244-0308308c2501/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231111043900-938d2d79dee9 h1:L/fbzYd21RJ5k650LqDzLpPn1MsHlfqDDlC/mpkl7qQ=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231111043900-938d2d79dee9/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.0.2 h1:9yCKha/T5XdGtO0q9Q9a6T5NUCsTn/DrBg0D7ufOcFM=

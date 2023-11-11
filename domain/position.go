@@ -22,12 +22,12 @@ type UserPosition struct {
 type UserPositionRepository interface {
 	Insert(ctx context.Context, userPosition *UserPosition) error
 	GetUserPosition(ctx context.Context, userID string) (*UserPosition, error)
-	GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]UserPosition, error)
+	GetUsersPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]UserPosition, error)
 }
 
 // UserPositionService defines the interface for the user position service.
 type UserPositionService interface {
 	RecordPosition(ctx context.Context, userID string, location GeoPoint, timestamp time.Time, clientID string, metadata PhoneMetadata) error
 	GetUserPosition(ctx context.Context, userID string) (*UserPosition, error)
-	GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]UserPosition, error)
+	GetUsersPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]UserPosition, error)
 }
