@@ -29,7 +29,7 @@ CREATE TABLE phone_metadata (
     os_version VARCHAR(255) NOT NULL,
     carrier VARCHAR(255) NOT NULL,
     corporate_id VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_position_id) REFERENCES user_positions(id)
+    FOREIGN KEY (user_position_id) REFERENCES user_positions(id) ON DELETE CASCADE
 );
 -- Create index for device_id
 CREATE INDEX idx_phone_metadata_device_id ON phone_metadata (device_id);

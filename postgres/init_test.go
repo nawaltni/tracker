@@ -62,6 +62,7 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			return err
 		}
+		db = db.Debug()
 		return db.Exec("SELECT 1").Error
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)

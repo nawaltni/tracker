@@ -11,7 +11,7 @@ type UserPosition struct {
 	UserID     string        `json:"user_id"`
 	Location   GeoPoint      `json:"location"`
 	CreatedAt  time.Time     `json:"created_at"`
-	PlaceID    *string        `json:"place_id,omitempty"`    // Optional, associated when within a Place
+	PlaceID    *string       `json:"place_id,omitempty"`    // Optional, associated when within a Place
 	PlaceName  *string       `json:"place_name,omitempty"`  // Optional, name of the Place if within one
 	CheckedIn  *time.Time    `json:"checked_in,omitempty"`  // Optional, time when user checked into a Place
 	CheckedOut *time.Time    `json:"checked_out,omitempty"` // Optional, time when user checked out of a Place
@@ -22,7 +22,7 @@ type UserPosition struct {
 type UserPositionRepository interface {
 	Insert(userPosition *UserPosition) error
 	GetUserPosition(userID string) (*UserPosition, error)
-	GetUsersPositionByCoordinates(lat float64, lon float64) ([]UserPosition, error)
+	GetUsersPositionByCoordinates(lat float64, lon float64, distance int) ([]UserPosition, error)
 }
 
 // UserPositionService defines the interface for the user position service.

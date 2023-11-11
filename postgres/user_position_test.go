@@ -107,6 +107,11 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 	err = createSampleUserPosition(db, id3, &placeID3, &placeName3, &now, nil)
 	require.Equal(t, nil, err)
 
+	t.Cleanup(func() {
+		err := db.Exec("DELETE FROM user_positions").Error
+		require.Equal(t, nil, err)
+	})
+
 	type fields struct {
 		client *Client
 	}
@@ -210,4 +215,96 @@ func createSampleUserPosition(
 	position.CheckedOut = checkedOut
 
 	return db.Create(position).Error
+}
+
+func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
+
+	// Create some test data
+
+	now := time.Now()
+
+	// With placeID and checkedIn/checkedOut
+	id1 := uuid.New().String()
+	placeID1 := uuid.New().String()
+	placeName1 := "place-name-1"
+	err := createSampleUserPosition(db, id1, &placeID1, &placeName1, &now, &now)
+	require.Equal(t, nil, err)
+
+	// Without placeID and no checkedIn/checkedOut
+	id2 := uuid.New().String()
+	err = createSampleUserPosition(db, id2, nil, nil, nil, nil)
+	require.Equal(t, nil, err)
+
+	// With placeID and checkin but no checkout
+	id3 := uuid.New().String()
+	placeID3 := uuid.New().String()
+	placeName3 := "place-name-3"
+	err = createSampleUserPosition(db, id3, &placeID3, &placeName3, &now, nil)
+	require.Equal(t, nil, err)
+
+	t.Cleanup(func() {
+		err := db.Exec("DELETE FROM user_positions").Error
+		require.Equal(t, nil, err)
+	})
+
+	type fields struct {
+		client *Client
+	}
+	type args struct {
+		lat      float64
+		lon      float64
+		distance int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{
+			name: "when no users are found we expect an empty list and no error",
+			fields: fields{
+				client: &Client{
+					db: db,
+				},
+			},
+			args: args{
+				lat:      40.7128,
+				lon:      -80.0060,
+				distance: 1000,
+			},
+			want:    0,
+			wantErr: false,
+		},
+		{
+			name: "when users are found we expect a list of users and no error",
+			fields: fields{
+				client: &Client{
+					db: db,
+				},
+			},
+			args: args{
+				lat:      40.7128,
+				lon:      -74.0061,
+				distance: 1000,
+			},
+			want:    3,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &UserPositionRepository{
+				client: tt.fields.client,
+			}
+			got, err := r.GetUsersPositionByCoordinates(tt.args.lat, tt.args.lon, tt.args.distance)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UserPositionRepository.GetUsersPositionByCoordinates() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			require.Equal(t, tt.want, len(got))
+		})
+	}
 }

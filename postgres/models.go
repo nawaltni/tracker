@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/paulmach/orb"
@@ -55,7 +54,6 @@ func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 }
 
 func (g *GeoPoint) Scan(input interface{}) error {
-	fmt.Printf("Scanning GeoPoint: %v\n with type %s", input, reflect.TypeOf(input))
 
 	var in []byte
 	switch v := input.(type) {

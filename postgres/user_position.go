@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nawaltni/tracker/domain"
+	"gorm.io/gorm/clause"
 )
 
 // UserPositionRepository is the GORM implementation of the UserPositionRepository.
@@ -20,7 +21,11 @@ func NewUserPositionRepository(client *Client) *UserPositionRepository {
 // There are
 func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error {
 	model := ToModelUserPosition(userPosition)
-	err := r.client.db.Create(&model).Error
+	err := r.client.db.
+		Clauses(clause.OnConflict{
+			UpdateAll: true,
+		}).
+		Create(&model).Error
 	if err != nil {
 		return fmt.Errorf("error inserting user position: %w", err)
 	}
@@ -40,15 +45,25 @@ func (r *UserPositionRepository) GetUserPosition(userID string) (*domain.UserPos
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
-func (r *UserPositionRepository) GetUsersPositionByCoordinates(lat float64, lon float64) ([]domain.UserPosition, error) {
-	var userPositions []domain.UserPosition
+func (r *UserPositionRepository) GetUsersPositionByCoordinates(lat float64, lon float64, distance int) ([]domain.UserPosition, error) {
+	var userPositions []UserPosition
 	// This will require raw SQL to utilize PostGIS functions.
 	// You need to adjust the SQL query to your needs (e.g., distance).
 	err := r.client.db.Raw(`
 	SELECT * FROM user_positions
-	WHERE ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography, 5000)
-	ORDER BY timestamp DESC
-	`, lon, lat).Scan(&userPositions).Error
+	WHERE ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?)
+	ORDER BY created_at DESC
+	`, lat, lon, distance).Scan(&userPositions).Error
 
-	return userPositions, err
+	if len(userPositions) == 0 {
+		return nil, nil
+	}
+
+	userPositionsDomain := make([]domain.UserPosition, len(userPositions))
+
+	for i, userPosition := range userPositions {
+		userPositionsDomain[i] = *ToDomainUserPosition(userPosition)
+	}
+
+	return userPositionsDomain, err
 }
