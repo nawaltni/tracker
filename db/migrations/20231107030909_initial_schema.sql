@@ -2,7 +2,6 @@
 -- Add PostGIS extension if it's not already created
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Create UserPositions Table
 CREATE TABLE user_positions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -10,9 +9,10 @@ CREATE TABLE user_positions (
     user_id UUID NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
-    place_id UUID,
-    checked_in TIMESTAMP WITH TIME ZONE,
-    checked_out TIMESTAMP WITH TIME ZONE,
+    place_id UUID NULL,
+    place_name TEXT NULL,
+    checked_in TIMESTAMP WITH TIME ZONE NULL,
+    checked_out TIMESTAMP WITH TIME ZONE NULL,
     -- PostGIS geographical point for location (latitude and longitude)
     location GEOMETRY(Point, 4326)
 );

@@ -17,6 +17,7 @@ func NewUserPositionRepository(client *Client) *UserPositionRepository {
 }
 
 // Insert adds a new UserPosition to the database.
+// There are
 func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error {
 	model := ToModelUserPosition(userPosition)
 	err := r.client.db.Create(&model).Error
@@ -29,9 +30,13 @@ func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error
 
 // GetUserPosition retrieves a user's most recent position from the database.
 func (r *UserPositionRepository) GetUserPosition(userID string) (*domain.UserPosition, error) {
-	var userPosition domain.UserPosition
-	err := r.client.db.Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
-	return &userPosition, err
+	var userPosition UserPosition
+	err := r.client.db.Preload("PhoneMetadata").Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving user position: %w", err)
+	}
+	pos := ToDomainUserPosition(userPosition)
+	return pos, err
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.

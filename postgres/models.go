@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/paulmach/orb"
@@ -12,12 +13,13 @@ import (
 )
 
 type UserPosition struct {
-	ID            string     `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	UserID        string     `gorm:"type:uuid;not null"`
-	Latitude      float64    `gorm:"type:double precision;not null"`
-	Longitude     float64    `gorm:"type:double precision;not null"`
-	CreatedAt     time.Time  `gorm:"type:timestamp with time zone;not null"`
-	PlaceID       *string    `gorm:"type:uuid"`
+	ID            string    `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	UserID        string    `gorm:"type:uuid;not null"`
+	Latitude      float64   `gorm:"type:double precision;not null"`
+	Longitude     float64   `gorm:"type:double precision;not null"`
+	CreatedAt     time.Time `gorm:"type:timestamp with time zone;not null"`
+	PlaceID       *string   `gorm:"type:uuid"`
+	PlaceName     *string
 	CheckedIn     *time.Time `gorm:"type:timestamp with time zone"`
 	CheckedOut    *time.Time `gorm:"type:timestamp with time zone"`
 	Location      GeoPoint
@@ -53,9 +55,19 @@ func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 }
 
 func (g *GeoPoint) Scan(input interface{}) error {
-	fmt.Printf("Scanning GeoPoint: %v\n", input)
+	fmt.Printf("Scanning GeoPoint: %v\n with type %s", input, reflect.TypeOf(input))
+
+	var in []byte
+	switch v := input.(type) {
+	case []byte:
+		in = v
+	case string:
+		in = []byte(v)
+	default:
+		return fmt.Errorf("invalid type for GeoPoint: %v", v)
+	}
 	var p orb.Point
-	err := ewkb.Scanner(&input).Scan(&p)
+	err := ewkb.Scanner(&p).Scan(in)
 	if err != nil {
 		return err
 	}

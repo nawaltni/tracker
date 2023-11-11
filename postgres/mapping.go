@@ -13,6 +13,7 @@ func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 		Longitude:  in.Location.Longitude,
 		CreatedAt:  in.CreatedAt,
 		PlaceID:    in.PlaceID,
+		PlaceName:  in.PlaceName,
 		CheckedIn:  in.CheckedIn,
 		CheckedOut: in.CheckedOut,
 		PhoneMetadata: PhoneMetadata{
@@ -38,6 +39,7 @@ func ToDomainUserPosition(in UserPosition) *domain.UserPosition {
 		Location:  domain.GeoPoint{Latitude: in.Latitude, Longitude: in.Longitude},
 		CreatedAt: in.CreatedAt,
 		PlaceID:   in.PlaceID,
+		PlaceName: in.PlaceName,
 		Metadata: domain.PhoneMetadata{
 			DeviceID:    in.PhoneMetadata.DeviceID,
 			Model:       in.PhoneMetadata.Model,
