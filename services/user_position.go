@@ -19,19 +19,26 @@ func NewUserPositionService(repo domain.UserPositionRepository) (*UserPositionSe
 
 // RecordPosition handles the logic for recording a user's position
 func (s *UserPositionService) RecordPosition(ctx context.Context, userID string, location domain.GeoPoint, timestamp time.Time, clientID string, metadata domain.PhoneMetadata) error {
-	// Here you will write the logic to process and save the user's position.
-	// This might involve calling methods on the userPositionRepo to insert data into the database.
-	return nil // Replace with actual implementation
+	// Create a UserPosition domain object
+	userPosition := domain.UserPosition{
+		UserID:    userID,
+		Location:  location,
+		CreatedAt: timestamp,
+		Metadata:  metadata,
+	}
+	// Here is where we call the places service to see if the location matches any places.
+	// We will also call the GetUserPosition to know the previous position of the user.
+	// With this 2 calls we can know if the user is entering or leaving a place.
+
+	return s.repo.Insert(ctx, &userPosition)
 }
 
 // GetUserPosition retrieves the current position of a user
 func (s *UserPositionService) GetUserPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
-	// Logic to retrieve the user's current position
-	return nil, nil // Replace with actual implementation
+	return s.repo.GetUserPosition(ctx, userID)
 }
 
-// GetUserPositionList retrieves the position history of a user
-func (s *UserPositionService) GetUserPositionList(ctx context.Context, userID string, clientID string, startTime, endTime time.Time) ([]domain.UserPosition, error) {
-	// Logic to retrieve the user's position history
-	return nil, nil // Replace with actual implementation
+// GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
+func (s *UserPositionService) GetUsersPositionByCoordinates(ctx context.Context, lat, long float64, distance int) ([]domain.UserPosition, error) {
+	return s.repo.GetUsersPositionByCoordinates(ctx, lat, long, distance)
 }

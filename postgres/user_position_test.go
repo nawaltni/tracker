@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -16,6 +17,8 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 		client *Client
 	}
 	type args struct {
+		ctx context.Context
+
 		userPosition *domain.UserPosition
 	}
 	tests := []struct {
@@ -33,6 +36,7 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx: context.Background(),
 				userPosition: &domain.UserPosition{
 					UserID:    uuid.New().String(),
 					Location:  domain.GeoPoint{Latitude: 40.7128, Longitude: -74.0060},
@@ -56,6 +60,7 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx: context.Background(),
 				userPosition: &domain.UserPosition{
 					UserID:    uuid.New().String(),
 					CreatedAt: time.Now(),
@@ -76,7 +81,7 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 			r := &UserPositionRepository{
 				client: tt.fields.client,
 			}
-			if err := r.Insert(tt.args.userPosition); (err != nil) != tt.wantErr {
+			if err := r.Insert(tt.args.ctx, tt.args.userPosition); (err != nil) != tt.wantErr {
 				t.Errorf("UserPositionRepository.Insert() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -116,6 +121,8 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 		client *Client
 	}
 	type args struct {
+		ctx context.Context
+
 		userID string
 	}
 	tests := []struct {
@@ -133,6 +140,8 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx: context.Background(),
+
 				userID: uuid.New().String(), // not existent
 			},
 			want:    nil,
@@ -146,6 +155,8 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx: context.Background(),
+
 				userID: id1,
 			},
 			want: &domain.UserPosition{
@@ -170,7 +181,7 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 			r := &UserPositionRepository{
 				client: tt.fields.client,
 			}
-			got, err := r.GetUserPosition(tt.args.userID)
+			got, err := r.GetUserPosition(tt.args.ctx, tt.args.userID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UserPositionRepository.GetUserPosition() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -251,6 +262,7 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 		client *Client
 	}
 	type args struct {
+		ctx      context.Context
 		lat      float64
 		lon      float64
 		distance int
@@ -270,6 +282,8 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx: context.Background(),
+
 				lat:      40.7128,
 				lon:      -80.0060,
 				distance: 1000,
@@ -285,6 +299,7 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx:      context.Background(),
 				lat:      40.7128,
 				lon:      -74.0061,
 				distance: 1000,
@@ -298,7 +313,7 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 			r := &UserPositionRepository{
 				client: tt.fields.client,
 			}
-			got, err := r.GetUsersPositionByCoordinates(tt.args.lat, tt.args.lon, tt.args.distance)
+			got, err := r.GetUsersPositionByCoordinates(tt.args.ctx, tt.args.lat, tt.args.lon, tt.args.distance)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UserPositionRepository.GetUsersPositionByCoordinates() error = %v, wantErr %v", err, tt.wantErr)
 				return

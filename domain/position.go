@@ -20,14 +20,14 @@ type UserPosition struct {
 
 // UserPositionRepository defines the interface for the user position storage.
 type UserPositionRepository interface {
-	Insert(userPosition *UserPosition) error
-	GetUserPosition(userID string) (*UserPosition, error)
-	GetUsersPositionByCoordinates(lat float64, lon float64, distance int) ([]UserPosition, error)
+	Insert(ctx context.Context, userPosition *UserPosition) error
+	GetUserPosition(ctx context.Context, userID string) (*UserPosition, error)
+	GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]UserPosition, error)
 }
 
 // UserPositionService defines the interface for the user position service.
 type UserPositionService interface {
 	RecordPosition(ctx context.Context, userID string, location GeoPoint, timestamp time.Time, clientID string, metadata PhoneMetadata) error
 	GetUserPosition(ctx context.Context, userID string) (*UserPosition, error)
-	GetUserPositionList(ctx context.Context, userID string, clientID string, startTime, endTime time.Time) ([]UserPosition, error)
+	GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]UserPosition, error)
 }

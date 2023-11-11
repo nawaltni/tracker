@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/nawaltni/tracker/domain"
@@ -19,7 +20,7 @@ func NewUserPositionRepository(client *Client) *UserPositionRepository {
 
 // Insert adds a new UserPosition to the database.
 // There are
-func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error {
+func (r *UserPositionRepository) Insert(ctx context.Context, userPosition *domain.UserPosition) error {
 	model := ToModelUserPosition(userPosition)
 	err := r.client.db.
 		Clauses(clause.OnConflict{
@@ -34,7 +35,7 @@ func (r *UserPositionRepository) Insert(userPosition *domain.UserPosition) error
 }
 
 // GetUserPosition retrieves a user's most recent position from the database.
-func (r *UserPositionRepository) GetUserPosition(userID string) (*domain.UserPosition, error) {
+func (r *UserPositionRepository) GetUserPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
 	var userPosition UserPosition
 	err := r.client.db.Preload("PhoneMetadata").Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
 	if err != nil {
@@ -45,7 +46,7 @@ func (r *UserPositionRepository) GetUserPosition(userID string) (*domain.UserPos
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
-func (r *UserPositionRepository) GetUsersPositionByCoordinates(lat float64, lon float64, distance int) ([]domain.UserPosition, error) {
+func (r *UserPositionRepository) GetUsersPositionByCoordinates(ctx context.Context, lat float64, lon float64, distance int) ([]domain.UserPosition, error) {
 	var userPositions []UserPosition
 	// This will require raw SQL to utilize PostGIS functions.
 	// You need to adjust the SQL query to your needs (e.g., distance).
