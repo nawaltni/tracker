@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/amacneil/dbmate/v2 v2.7.0
-	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231111043900-938d2d79dee9
+	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231114022526-8bd08fe3e06d
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.8.0

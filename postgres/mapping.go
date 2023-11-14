@@ -25,7 +25,7 @@ func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 		},
 	}
 
-	point := orb.Point{in.Location.Longitude, in.Location.Latitude}
+	point := orb.Point{float64(in.Location.Longitude), float64(in.Location.Latitude)}
 
 	// point := geom.NewPoint(geom.XY).MustSetCoords(geom.Coord{in.Location.Longitude, in.Location.Latitude}).SetSRID(4326)
 	up.Location = GeoPoint{Point: point}

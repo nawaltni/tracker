@@ -22,6 +22,13 @@ type Configuration struct {
 		Host string `mapstructure:"host"`
 		Port int    `mapstructure:"port"`
 	} `mapstructure:"grpc"`
+
+	Places Places `mapstructure:"places"`
+}
+
+type Places struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 // LoadConfig loads the configuration from file and environment variables

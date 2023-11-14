@@ -14,8 +14,8 @@ import (
 type UserPosition struct {
 	ID            string    `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
 	UserID        string    `gorm:"type:uuid;not null"`
-	Latitude      float64   `gorm:"type:double precision;not null"`
-	Longitude     float64   `gorm:"type:double precision;not null"`
+	Latitude      float32   `gorm:"type:double precision;not null"`
+	Longitude     float32   `gorm:"type:double precision;not null"`
 	CreatedAt     time.Time `gorm:"type:timestamp with time zone;not null"`
 	PlaceID       *string   `gorm:"type:uuid"`
 	PlaceName     *string
