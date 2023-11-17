@@ -3,17 +3,17 @@
 environment = "development"
 
 [postgres]
-host = "localhost"
+host = "db"
 port = 5432
-database = "places"
+database = "tracker"
 user = "postgres"
 password = "postgres"
 run_migrations = true
 
 [grpc]
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = 50051
 
 [places]
-host = "127.0.0.1"
-port = 50052
+host = "places"
+port = 50051

@@ -39,7 +39,7 @@ func LoadConfig(cmd *cobra.Command) (*Configuration, error) {
 	}
 
 	// from the environment
-	viper.SetEnvPrefix("PLACES")
+	viper.SetEnvPrefix("TRACKER")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 

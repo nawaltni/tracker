@@ -2,7 +2,7 @@ package domain
 
 import "context"
 
-// TrackerClientBigquery is the interface for the bigquery client.
-type TrackerClientBigquery interface {
+// BigqueryClient is the interface for the bigquery client.
+type BigqueryClient interface {
 	RecordUserPosition(ctx context.Context, userPosition UserPosition) error
 }

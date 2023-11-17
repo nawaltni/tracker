@@ -10,14 +10,22 @@ import (
 
 // UserPositionService is the service for UserPosition
 type UserPositionService struct {
-	repo                  domain.UserPositionRepository
-	placesClientGRPC      domain.PlacesClientGRPC
-	trackerClientBigquery domain.TrackerClientBigquery
+	repo             domain.UserPositionRepository
+	placesClientGRPC domain.PlacesClientGRPC
+	bigqueryClient   domain.BigqueryClient
 }
 
 // NewUserPositionService creates a new UserPositionService
-func NewUserPositionService(repo domain.UserPositionRepository) (*UserPositionService, error) {
-	return &UserPositionService{repo: repo}, nil
+func NewUserPositionService(
+	repo domain.UserPositionRepository,
+	placesClient domain.PlacesClientGRPC,
+	bigqueryClient domain.BigqueryClient,
+) (*UserPositionService, error) {
+	return &UserPositionService{
+		repo:             repo,
+		placesClientGRPC: placesClient,
+		bigqueryClient:   bigqueryClient,
+	}, nil
 }
 
 // RecordPosition handles the logic for recording a user's position
@@ -59,7 +67,7 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userID string,
 	s.CalculateUserPosition(&userPosition, *knownPosition)
 
 	// Call the tracker bigquery service to record the user's position
-	err = s.trackerClientBigquery.RecordUserPosition(ctx, userPosition)
+	err = s.bigqueryClient.RecordUserPosition(ctx, userPosition)
 	if err != nil {
 		return fmt.Errorf("error recording position in BigQuery: %w", err)
 	}

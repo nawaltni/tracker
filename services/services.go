@@ -13,8 +13,11 @@ type Services struct {
 }
 
 // NewServices creates a new Services instance
-func NewServices(config config.Configuration, repos *postgres.Repositories) (*Services, error) {
-	userPositionService, err := NewUserPositionService(repos.Places)
+func NewServices(
+	config config.Configuration, repos *postgres.Repositories,
+	placesClient domain.PlacesClientGRPC, bigqueryClient domain.BigqueryClient,
+	) (*Services, error) {
+	userPositionService, err := NewUserPositionService(repos.UserPosition, placesClient, bigqueryClient)
 	if err != nil {
 		return nil, err
 	}

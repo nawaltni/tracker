@@ -2,9 +2,11 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/nawaltni/tracker/domain"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -39,10 +41,17 @@ func (r *UserPositionRepository) GetUserPosition(ctx context.Context, userID str
 	var userPosition UserPosition
 	err := r.client.db.Preload("PhoneMetadata").Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
 	if err != nil {
+		if IsNotFoundError(err) {
+			return nil, domain.ErrNotFound
+		}
 		return nil, fmt.Errorf("error retrieving user position: %w", err)
 	}
 	pos := ToDomainUserPosition(userPosition)
 	return pos, err
+}
+
+func IsNotFoundError(err error) bool {
+	return errors.Is(err, gorm.ErrRecordNotFound)
 }
 
 // GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.

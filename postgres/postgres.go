@@ -61,13 +61,13 @@ func NewClient(host string, port int, user, password, dbname string) (*Client, e
 
 // Repositories contains all repositories of the application
 type Repositories struct {
-	Places *UserPositionRepository
+	UserPosition *UserPositionRepository
 }
 
 // NewRepositories creates new repositories
 func NewRepositories(client *Client) (*Repositories, error) {
 	repos := &Repositories{
-		Places: NewUserPositionRepository(client),
+		UserPosition: NewUserPositionRepository(client),
 	}
 
 	return repos, nil
@@ -91,7 +91,7 @@ func MigrateUp(host string, port int, user, password, dbname string) error {
 
 	configPath := dir + "/db/migrations"
 	if currentFolder == "nawaltni" {
-		configPath = dir + "/places/db/migrations"
+		configPath = dir + "/tracker/db/migrations"
 	}
 
 	dbm.MigrationsDir = []string{configPath}

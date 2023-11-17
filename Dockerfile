@@ -57,7 +57,8 @@ COPY --from=builder /go/bin/tracker /go/bin/tracker
 # Create appuser
 RUN adduser -D -g '' appuser
 WORKDIR /code
-COPY config.json ./
+COPY ./db /code/db
+COPY config.toml ./
 RUN chown appuser /code
 
 

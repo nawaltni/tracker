@@ -12,26 +12,28 @@ import (
 )
 
 type UserPosition struct {
-	ID            string    `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	UserID        string    `gorm:"type:uuid;not null"`
-	Latitude      float32   `gorm:"type:double precision;not null"`
-	Longitude     float32   `gorm:"type:double precision;not null"`
-	CreatedAt     time.Time `gorm:"type:timestamp with time zone;not null"`
-	PlaceID       *string   `gorm:"type:uuid"`
+	UserID        string `gorm:"primary_key"`
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Latitude      float32
+	Longitude     float32
+	PlaceID       *string
 	PlaceName     *string
-	CheckedIn     *time.Time `gorm:"type:timestamp with time zone"`
-	CheckedOut    *time.Time `gorm:"type:timestamp with time zone"`
+	CheckedIn     *time.Time
+	CheckedOut    *time.Time
 	Location      GeoPoint
-	PhoneMetadata PhoneMetadata
+	PhoneMetadata PhoneMetadata `gorm:"foreignKey:user_id"`
 }
 
 type PhoneMetadata struct {
-	UserPositionID string `gorm:"type:uuid;primary_key"`
-	DeviceID       string `gorm:"type:varchar(255);not null"`
-	Model          string `gorm:"type:varchar(255);not null"`
-	OSVersion      string `gorm:"type:varchar(255);not null"`
-	Carrier        string `gorm:"type:varchar(255);not null"`
-	CorporateID    string `gorm:"type:varchar(255);not null"`
+	UserID      string `gorm:"primary_key"`
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeviceID    string
+	Model       string
+	OSVersion   string
+	Carrier     string
+	CorporateID string
 }
 
 type GeoPoint struct {

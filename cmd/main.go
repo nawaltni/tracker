@@ -3,7 +3,11 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
+	"github.com/nawaltni/tracker/bigquery"
+	grpcClients "github.com/nawaltni/tracker/clients/grpc"
 	"github.com/nawaltni/tracker/config"
 	"github.com/nawaltni/tracker/grpc"
 	"github.com/nawaltni/tracker/postgres"
@@ -26,6 +30,10 @@ func RootCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
+	for _, e := range os.Environ() {
+		pair := strings.SplitN(e, "=", 2)
+		fmt.Println(pair[0])
+	}
 	// 1. Read Config
 	conf, err := config.LoadConfig(cmd)
 	if err != nil {
@@ -60,8 +68,24 @@ func run(cmd *cobra.Command, args []string) {
 
 	}
 
+	// 4. Create Places Client
+	placesClient, err := grpcClients.NewPlacesClientGRPC(conf.Places)
+	if err != nil {
+		log.Fatal("Failed to create places grpc client: " + err.Error())
+		return
+	}
+
+	// 5. Create Bigquery Client
+	bigqueryClient, err := bigquery.NewClient()
+	if err != nil {
+		log.Fatal("Failed to create bigquery client: " + err.Error())
+		return
+	}
+
+
+
 	// 4. Create Services
-	services, err := services.NewServices(*conf, repost)
+	services, err := services.NewServices(*conf, repost, placesClient, bigqueryClient)
 	if err != nil {
 		log.Fatal("Failed to create services: " + err.Error())
 		return
