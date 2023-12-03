@@ -39,7 +39,7 @@ func (r *UserPositionRepository) Insert(ctx context.Context, userPosition *domai
 // GetUserPosition retrieves a user's most recent position from the database.
 func (r *UserPositionRepository) GetUserPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
 	var userPosition UserPosition
-	err := r.client.db.Preload("PhoneMetadata").Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
+	err := r.client.db.Preload("PhoneMeta").Where("user_id = ?", userID).Order("created_at DESC").First(&userPosition).Error
 	if err != nil {
 		if IsNotFoundError(err) {
 			return nil, domain.ErrNotFound

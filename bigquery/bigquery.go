@@ -2,18 +2,38 @@ package bigquery
 
 import (
 	"context"
-	"log/slog"
+	"fmt"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/nawaltni/tracker/domain"
 )
 
-type Client struct{}
+// Client is a bigquery client wrapper we use to communicate with bigquery
+type Client struct {
+	client *bigquery.Client
+}
 
-func NewClient() (*Client, error) {
-	return &Client{}, nil
+// NewClient returns a new bigquery client
+func NewClient(project string) (*Client, error) {
+	c, err := bigquery.NewClient(context.Background(), project)
+	if err != nil {
+		return nil, err
+	}
+	return &Client{
+		client: c,
+	}, nil
 }
 
 func (c *Client) RecordUserPosition(ctx context.Context, userPosition domain.UserPosition) error {
-	slog.Info("Bigquery would record the user position", "info", userPosition)
+
+	data := []UserPosition{
+		mapToUserPosition(userPosition),
+	}
+
+	inserter := c.client.Dataset("development").Table("user_positions").Inserter()
+
+	if err := inserter.Put(ctx, data); err != nil {
+		return fmt.Errorf("error inserting rows: %w", err)
+	}
 	return nil
 }

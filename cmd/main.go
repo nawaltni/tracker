@@ -76,13 +76,11 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// 5. Create Bigquery Client
-	bigqueryClient, err := bigquery.NewClient()
+	bigqueryClient, err := bigquery.NewClient("nawalt")
 	if err != nil {
 		log.Fatal("Failed to create bigquery client: " + err.Error())
 		return
 	}
-
-
 
 	// 4. Create Services
 	services, err := services.NewServices(*conf, repost, placesClient, bigqueryClient)

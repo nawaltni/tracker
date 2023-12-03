@@ -29,17 +29,10 @@ func NewUserPositionService(
 }
 
 // RecordPosition handles the logic for recording a user's position
-func (s *UserPositionService) RecordPosition(ctx context.Context, userID string, location domain.GeoPoint, timestamp time.Time, clientID string, metadata domain.PhoneMetadata) error {
-	// Create a UserPosition domain object
-	userPosition := domain.UserPosition{
-		UserID:    userID,
-		Location:  location,
-		CreatedAt: timestamp,
-		Metadata:  metadata,
-	}
+func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition domain.UserPosition) error {
 
 	// Call places grpc service to see if the location matches any places
-	res, err := s.placesClientGRPC.IsWithinPlace(ctx, location.Latitude, location.Longitude)
+	res, err := s.placesClientGRPC.IsWithinPlace(ctx, userPosition.Location.Latitude, userPosition.Location.Longitude)
 	if err != nil {
 		return err
 	}
@@ -51,7 +44,7 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userID string,
 	}
 
 	// Now we will call the GetUserPosition to know the previous position of the user.
-	knownPosition, err := s.GetUserPosition(ctx, userID)
+	knownPosition, err := s.GetUserPosition(ctx, userPosition.UserID)
 	if err != nil && err != domain.ErrNotFound {
 		return fmt.Errorf("error getting user position: %w", err)
 	}

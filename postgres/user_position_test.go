@@ -41,12 +41,13 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 					UserID:    uuid.New().String(),
 					Location:  domain.GeoPoint{Latitude: 40.7128, Longitude: -74.0060},
 					CreatedAt: time.Now(),
-					Metadata: domain.PhoneMetadata{
-						DeviceID:    "device-uuid-1",
-						Model:       "model-1",
-						OSVersion:   "os-1",
-						Carrier:     "carrier-1",
-						CorporateID: "corp-id-1",
+					PhoneMeta: domain.PhoneMeta{
+						DeviceID: "device-uuid-1",
+						Brand:    "samsung",
+						Model:    "s7",
+						OS:       "android 12.3",
+						Carrier:  "claro",
+						Battery:  90,
 					},
 				},
 			},
@@ -64,12 +65,13 @@ func TestUserPositionRepository_Insert(t *testing.T) {
 				userPosition: &domain.UserPosition{
 					UserID:    uuid.New().String(),
 					CreatedAt: time.Now(),
-					Metadata: domain.PhoneMetadata{
-						DeviceID:    "device-uuid-1",
-						Model:       "model-1",
-						OSVersion:   "os-1",
-						Carrier:     "carrier-1",
-						CorporateID: "corp-id-1",
+					PhoneMeta: domain.PhoneMeta{
+						DeviceID: "device-uuid-1",
+						Brand:    "samsung",
+						Model:    "s7",
+						OS:       "android 12.3",
+						Carrier:  "claro",
+						Battery:  90,
 					},
 				},
 			},
@@ -165,12 +167,13 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 				CreatedAt: now,
 				PlaceID:   &placeID1,
 				PlaceName: &placeName1,
-				Metadata: domain.PhoneMetadata{
-					DeviceID:    "device-uuid-1",
-					Model:       "model-1",
-					OSVersion:   "os-1",
-					Carrier:     "carrier-1",
-					CorporateID: "corp-id-1",
+				PhoneMeta: domain.PhoneMeta{
+					DeviceID: "device-uuid-1",
+					Brand:    "samsung",
+					Model:    "s7",
+					OS:       "android 12.3",
+					Carrier:  "claro",
+					Battery:  90,
 				},
 			},
 			wantErr: false,
@@ -194,7 +197,7 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 				require.Equal(t, tt.want.CreatedAt.Round(time.Minute), got.CreatedAt.Round(time.Minute))
 				require.Equal(t, tt.want.PlaceID, got.PlaceID)
 				require.Equal(t, tt.want.PlaceName, got.PlaceName)
-				require.Equal(t, tt.want.Metadata, got.Metadata)
+				require.Equal(t, tt.want.PhoneMeta, got.PhoneMeta)
 				require.Equal(t, tt.want.Location, got.Location)
 			}
 		})
@@ -213,12 +216,13 @@ func createSampleUserPosition(
 		Location:  GeoPoint{Point: orb.Point{40.7128, -74.0060}},
 
 		CreatedAt: time.Now(),
-		PhoneMetadata: PhoneMetadata{
-			DeviceID:    "device-uuid-1",
-			Model:       "model-1",
-			OSVersion:   "os-1",
-			Carrier:     "carrier-1",
-			CorporateID: "corp-id-1",
+		PhoneMeta: PhoneMeta{
+			DeviceID: "device-uuid-1",
+			Brand:    "samsung",
+			Model:    "s7",
+			OS:       "android 12.3",
+			Carrier:  "claro",
+			Battery:  90,
 		},
 	}
 

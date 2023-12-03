@@ -1,0 +1,8 @@
+{
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--fast"],
+  "files.associations": {
+    "*.proto": "proto3",
+    "context.C": "cpp"
+  }
+}

@@ -16,12 +16,14 @@ func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 		PlaceName:  in.PlaceName,
 		CheckedIn:  in.CheckedIn,
 		CheckedOut: in.CheckedOut,
-		PhoneMetadata: PhoneMetadata{
-			DeviceID:    in.Metadata.DeviceID,
-			Model:       in.Metadata.Model,
-			OSVersion:   in.Metadata.OSVersion,
-			Carrier:     in.Metadata.Carrier,
-			CorporateID: in.Metadata.CorporateID,
+		PhoneMeta: PhoneMeta{
+			DeviceID:   in.PhoneMeta.DeviceID,
+			Brand:      in.PhoneMeta.Brand,
+			Model:      in.PhoneMeta.Model,
+			OS:         in.PhoneMeta.OS,
+			AppVersion: in.PhoneMeta.AppVersion,
+			Carrier:    in.PhoneMeta.Carrier,
+			Battery:    in.PhoneMeta.Battery,
 		},
 	}
 
@@ -40,12 +42,14 @@ func ToDomainUserPosition(in UserPosition) *domain.UserPosition {
 		CreatedAt: in.CreatedAt,
 		PlaceID:   in.PlaceID,
 		PlaceName: in.PlaceName,
-		Metadata: domain.PhoneMetadata{
-			DeviceID:    in.PhoneMetadata.DeviceID,
-			Model:       in.PhoneMetadata.Model,
-			OSVersion:   in.PhoneMetadata.OSVersion,
-			Carrier:     in.PhoneMetadata.Carrier,
-			CorporateID: in.PhoneMetadata.CorporateID,
+		PhoneMeta: domain.PhoneMeta{
+			DeviceID:   in.PhoneMeta.DeviceID,
+			Brand:      in.PhoneMeta.Brand,
+			Model:      in.PhoneMeta.Model,
+			OS:         in.PhoneMeta.OS,
+			AppVersion: in.PhoneMeta.AppVersion,
+			Carrier:    in.PhoneMeta.Carrier,
+			Battery:    in.PhoneMeta.Battery,
 		},
 	}
 	// Conditional assignment for optional fields

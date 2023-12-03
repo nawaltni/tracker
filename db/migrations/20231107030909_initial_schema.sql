@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create UserPositions Table
 CREATE TABLE user_positions (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reference TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
@@ -20,22 +21,25 @@ CREATE TABLE user_positions (
 CREATE INDEX idx_user_positions_created_at ON user_positions (created_at);
 -- Create index for location
 CREATE INDEX idx_user_positions_location ON user_positions USING GIST (location);
--- Create PhoneMetadata Table
-CREATE TABLE phone_metadata (
+-- Create PhoneMeta Table
+CREATE TABLE phone_meta (
     user_id UUID PRIMARY KEY REFERENCES user_positions(user_id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    device_id VARCHAR(255) NOT NULL,
-    model VARCHAR(255) NOT NULL,
-    os_version VARCHAR(255) NOT NULL,
-    carrier VARCHAR(255) NOT NULL,
-    corporate_id VARCHAR(255) NOT NULL,
+    id TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    brand TEXT NOT NULL,
+    model TEXT NOT NULL,
+    os TEXT NOT NULL,
+    app_version TEXT NOT NULL,
+    carrier TEXT NOT NULL,
+    battery INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user_positions(user_id) ON DELETE CASCADE
 );
 -- Create index for device_id
-CREATE INDEX idx_phone_metadata_device_id ON phone_metadata (device_id);
+CREATE INDEX idx_phone_meta_device_id ON phone_meta (device_id);
 -- migrate:down
 -- Drop the tables and indexes
-DROP TABLE IF EXISTS phone_metadata;
+DROP TABLE IF EXISTS phone_meta;
 DROP TABLE IF EXISTS user_positions;
 DROP EXTENSION IF EXISTS postgis;

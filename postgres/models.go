@@ -12,28 +12,32 @@ import (
 )
 
 type UserPosition struct {
-	UserID        string `gorm:"primary_key"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	Latitude      float32
-	Longitude     float32
-	PlaceID       *string
-	PlaceName     *string
-	CheckedIn     *time.Time
-	CheckedOut    *time.Time
-	Location      GeoPoint
-	PhoneMetadata PhoneMetadata `gorm:"foreignKey:user_id"`
+	UserID     string `gorm:"primary_key"`
+	Reference  string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	Latitude   float32
+	Longitude  float32
+	PlaceID    *string
+	PlaceName  *string
+	CheckedIn  *time.Time
+	CheckedOut *time.Time
+	Location   GeoPoint
+	PhoneMeta  PhoneMeta `gorm:"foreignKey:user_id"`
 }
 
-type PhoneMetadata struct {
-	UserID      string `gorm:"primary_key"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	DeviceID    string
-	Model       string
-	OSVersion   string
-	Carrier     string
-	CorporateID string
+type PhoneMeta struct {
+	UserID     string `gorm:"primary_key"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	ID         string
+	DeviceID   string
+	Brand      string
+	Model      string
+	OS         string
+	AppVersion string
+	Carrier    string
+	Battery    int
 }
 
 type GeoPoint struct {

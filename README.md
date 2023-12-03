@@ -41,4 +41,20 @@ $  grpcurl -d @ -plaintext localhost:50051 nawalt.tracker.v1.TrackingService.Rec
     }
 }
 EOM
+```bash
+
+$  grpcurl -d @ -plaintext localhost:50051 nawalt.tracker.v1.TrackingService.RecordPosition <<EOM
+{
+    "user_id": "018bdb59-6ad8-7980-a347-0fa6c27ae9ea",
+    "location": {
+        "latitude": 12.10193458760576,
+        "longitude": -86.26166582107545
+    },
+    "timestamp": "2023-11-17T03:39:48+00:00",
+    "client_id": "018bdb5e-743d-74e6-a6cd-abfef24bc260",
+    "metadata": {
+        "device_id": "352032066517282"
+    }
+}
+EOM
 ```
