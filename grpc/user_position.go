@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/gofrs/uuid/v5"
 	pb "github.com/nawaltni/api/gen/go/nawalt/tracker/v1"
@@ -23,7 +24,7 @@ func NewServer(srvs *services.Services) *Server {
 func (s *Server) RecordPosition(ctx context.Context, req *pb.RecordPositionRequest) (*pb.RecordPositionResponse, error) {
 	// get the id from the request metadata
 	// if the id is not present, generate a new one
-
+	slog.Info("RecordPosition request received", "user_id", req.UserId)
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to generate uuid")

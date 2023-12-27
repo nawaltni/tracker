@@ -10,5 +10,5 @@ type GeoPoint struct {
 
 // String returns the string representation of a GeoPoint.
 func (g GeoPoint) String() string {
-	return fmt.Sprintf("%f,%f", g.Latitude, g.Longitude)
+	return fmt.Sprintf("POINT(%f %f)", g.Latitude, g.Longitude)
 }

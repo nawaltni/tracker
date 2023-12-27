@@ -1,10 +1,13 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
+	"os"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	pb "github.com/nawaltni/api/gen/go/nawalt/tracker/v1"
 	"github.com/nawaltni/tracker/config"
 	"github.com/nawaltni/tracker/services"
@@ -34,7 +37,18 @@ func New(conf config.Configuration, services *services.Services) (*Server, error
 		services: services,
 	}
 
-	s := grpc.NewServer()
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	opts := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+		// Add any other option (check functions starting with logging.With).
+	}
+
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(InterceptorLogger(logger), opts...),
+			// Add any other interceptor you want.
+		),
+	)
 	reflection.Register(s)
 	pb.RegisterTrackingServiceServer(s, &server)
 	server.s = s
@@ -50,4 +64,12 @@ func (s *Server) Start() error {
 	}
 
 	return nil
+}
+
+// InterceptorLogger adapts slog logger to interceptor logger.
+// This code is simple enough to be copied and not imported.
+func InterceptorLogger(l *slog.Logger) logging.Logger {
+	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		l.Log(ctx, slog.Level(lvl), msg, fields...)
+	})
 }

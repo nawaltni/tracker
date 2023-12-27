@@ -5,7 +5,9 @@ go 1.21.4
 require (
 	cloud.google.com/go/bigquery v1.57.1
 	github.com/amacneil/dbmate/v2 v2.7.0
-	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231203023710-cbf2c23d2b63
+	github.com/gofrs/uuid/v5 v5.0.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
+	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231214023645-f1cfd5bd9451
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.8.0
@@ -38,8 +40,6 @@ require (
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
-	github.com/gofrs/uuid/v5 v5.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

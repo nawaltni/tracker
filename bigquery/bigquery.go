@@ -30,7 +30,7 @@ func (c *Client) RecordUserPosition(ctx context.Context, userPosition domain.Use
 		mapToUserPosition(userPosition),
 	}
 
-	inserter := c.client.Dataset("development").Table("user_positions").Inserter()
+	inserter := c.client.Dataset("development").Table("users-position").Inserter()
 
 	if err := inserter.Put(ctx, data); err != nil {
 		return fmt.Errorf("error inserting rows: %w", err)
