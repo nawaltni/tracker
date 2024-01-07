@@ -5,7 +5,7 @@ metadata:
   labels:
     app: "{{ .Values.name }}"
 spec:
-  replicas: { { .Values.replicas } }
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: "{{ .Values.name }}"
@@ -20,11 +20,11 @@ spec:
           image: "{{ .Values.deployment.image }}:{{ .Values.deployment.tag }}"
           readinessProbe:
             grpc:
-              port: { { .Values.grpc.port } }
+              port: {{ .Values.grpc.port }}
             initialDelaySeconds: 5
           livenessProbe:
             grpc:
-              port: { { .Values.grpc.port } }
+              port: {{ .Values.grpc.port }}
             initialDelaySeconds: 10
           imagePullPolicy: Always
           resources:
@@ -35,7 +35,7 @@ spec:
               memory: "{{ .Values.resources.limits.memory }}"
               cpu: "{{ .Values.resources.limits.cpu }}"
           ports:
-            - containerPort: { { .Values.grpc.port } }
+            - containerPort: {{ .Values.grpc.port }}
           # The following environment variables will contain the database host,
           # user and password to connect to the PostgreSQL instance.
           env:
@@ -69,6 +69,11 @@ spec:
                 secretKeyRef:
                   name: "{{ .Values.name }}"
                   key: postgresPassword
+            - name: TRACKER_POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresHost
             - name: TRACKER_POSTGRES_PORT
               valueFrom:
                 configMapKeyRef:

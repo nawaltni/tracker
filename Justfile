@@ -1,12 +1,13 @@
 default:
     just --list
 
-start params *FLAGS:
+# start the development environment: just start, just --build start
+start params *FLAGS: 
 	# Start development environment.
 	echo "\033[2m→ Starting development environment...\033[0m"
 	./scripts/run_dev.sh {{FLAGS}} {{params}}
 
-
+	
 test:
 	# Run unit-tests with coverage.
 	echo "\033[2m→ Running unit tests...\033[0m"
@@ -18,20 +19,20 @@ lint:
 	golangci-lint run --config .golangci.yml
 
 # Database
+# Start migrations.
 migrate:
-	# Start migrations.
 	echo "\033[2m→ Starting migrations...\033[0m"
 	./scripts/run_migrations.sh
 
+# Start seeding database
 seed:
-	# Start seeding databases
-	echo "\033[2m→ Starting seeding databases...\033[0m"
+	echo "\033[2m→ Starting seeding database...\033[0m"
 	./scripts/run_seed.sh
-# # Deployment
-# deploy-staging:
-# 	# Build and deploy adapult to staging cloud
-# 	echo "\033[2m→ Deploying adapult to staging...\033[0m"
-# 	./k8s/scripts/staging/deploy.sh
+
+# Build and deploy auth to gke
+deploy environment *FLAGS:
+	echo "\033[2m→ Deploying auth to {{environment}}  ...\033[0m"
+	./k8s/scripts/deploy.sh {{environment}} {{FLAGS}}
 	
 # # Other
 # help:

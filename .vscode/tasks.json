@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cp .env",
+      "type": "shell",
+      "command": "cp",
+      "args": ["env.example", ".env"],
+      "options": {
+        "cwd": "${workspaceRoot}"
+      }
+    },
+    {
+      "label": "git-config",
+      "type": "shell",
+      "command": "git",
+      "args": [
+        "config",
+        "--global",
+        "url.'git@bitbucket.org:'.insteadOf",
+        "https://bitbucket.org/"
+      ],
+      "options": {
+        "cwd": "${workspaceRoot}"
+      }
+    },
+    {
+      "label": "go: build (debug)",
+      "type": "shell",
+      "command": "go",
+      "args": ["build"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "GOPRIVATE": "bitbucket.org/getit039/location,bitbucket.org/getit039/vespa-go"
+        }
+      }
+    },
+    {
+      "label": "mkdirs",
+      "type": "shell",
+      "command": "mkdir",
+      "args": ["-p", "./localfiles/downloading"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      }
+    },
+    {
+      "label": "Pre launch tasks",
+      "dependsOn": ["cp .env", "git-config", "go: build (debug)", "mkdirs"]
+    }
+  ]
+}

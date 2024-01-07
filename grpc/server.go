@@ -13,6 +13,7 @@ import (
 	"github.com/nawaltni/tracker/services"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -50,6 +51,7 @@ func New(conf config.Configuration, services *services.Services) (*Server, error
 		),
 	)
 	reflection.Register(s)
+	grpc_health_v1.RegisterHealthServer(s, &server)
 	pb.RegisterTrackingServiceServer(s, &server)
 	server.s = s
 
@@ -72,4 +74,15 @@ func InterceptorLogger(l *slog.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 		l.Log(ctx, slog.Level(lvl), msg, fields...)
 	})
+}
+
+// Check implements the health check for the GRPC server
+func (s *Server) Check(ctx context.Context, in *grpc_health_v1.HealthCheckRequest) (*grpc_health_v1.HealthCheckResponse, error) {
+	return &grpc_health_v1.HealthCheckResponse{Status: grpc_health_v1.HealthCheckResponse_SERVING}, nil
+}
+
+// Watch implements the health check for the GRPC server
+func (s *Server) Watch(in *grpc_health_v1.HealthCheckRequest, _ grpc_health_v1.Health_WatchServer) error {
+	// Example of how to register both methods but only implement the Check method.
+	return nil
 }

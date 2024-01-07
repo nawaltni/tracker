@@ -1,0 +1,27 @@
+{
+  "version": "0.1.0",
+  "configurations": [
+    {
+      "name": "Debug ingester",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/main.go",
+      "console": "integratedTerminal",
+      "args": ["start", "ingester"],
+      "envFile": "${workspaceRoot}/.env",
+      "preLaunchTask": "Pre launch tasks"
+    },
+    {
+      "name": "Debug vespa_indexer",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/main.go",
+      "console": "integratedTerminal",
+      "args": ["start", "vespa_indexer"],
+      "envFile": "${workspaceRoot}/.env",
+      "preLaunchTask": "Pre launch tasks"
+    }
+  ]
+}

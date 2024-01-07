@@ -77,7 +77,7 @@ func NewRepositories(client *Client) (*Repositories, error) {
 func MigrateUp(host string, port int, user, password, dbname string) error {
 	// Connection string
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		user, password, host, port, dbname)
+		user, url.QueryEscape(password), host, port, dbname)
 
 	u, _ := url.Parse(connString)
 	dbm := dbmate.New(u)

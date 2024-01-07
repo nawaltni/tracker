@@ -1,8 +1,9 @@
 {
-  "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast"],
-  "files.associations": {
-    "*.proto": "proto3",
-    "context.C": "cpp"
+  "gopls": {
+    "formatting.gofumpt": true
+  },
+  "go.lintTool": "revive",
+  "[helm]": {
+    "editor.formatOnSave": false
   }
 }
