@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}"
+  labels:
+    app: "{{ .Values.name }}"
+    monitor: "true"
+spec:
+  type: NodePort
+  ports:
+    - name: tcp
+      protocol: TCP
+      port: {{ .Values.grpc.servicePort }}
+      targetPort: {{ .Values.grpc.port }}
+  selector:
+    app: "{{ .Values.name }}"

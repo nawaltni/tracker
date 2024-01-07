@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+  name: "{{ .Values.name }}"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "{{ .Values.ingress.domain }}"
+    http:
+      paths:
+      - path: /grpc/v1/{{ .Values.name }}/
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ .Values.name }}"
+            port:
+              number: {{ .Values.servicePort }}
+  tls:
+    - hosts:
+        - "{{ .Values.ingress.domain }}"
+      secretName: "{{ .Values.ingress.domain }}-tls"

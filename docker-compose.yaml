@@ -20,10 +20,11 @@ services:
     container_name: tracker
     environment:
       - TRACKER_POSTGRES_HOST=${POSTGRES_HOST}
-      - GOOGLE_APPLICATION_CREDENTIALS=/code/credentials.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/code/application_default_credentials.json # for gcloud
     depends_on:
       - db
     ports:
       - "50051:50051"
     volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/code/credentials.json
+      - ./config.toml:/code/config.toml # for using config file from local machine
+      - ~/.config/gcloud/application_default_credentials.json:/code/application_default_credentials.json # for gcloud

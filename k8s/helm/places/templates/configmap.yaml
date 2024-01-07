@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}"
+data:
+  environment: "{{ .Values.env.config.environment }}"
+  grpcHost: "{{ .Values.grpc.host }}"
+  grpcPort: "{{ .Values.grpc.port }}"
+  postgresUser: "{{ .Values.postgres.user }}"
+  postgresHost: "{{ .Values.postgres.host }}"
+  postgresPort: "{{ .Values.postgres.port }}"
+  postgresDB: "{{ .Values.postgres.db }}"
+  postgresMigrate: "{{ .Values.postgres.migrate }}"
+  

@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.name }}"
+  labels:
+    app: "{{ .Values.name }}"
+spec:
+  replicas: { { .Values.replicas } }
+  selector:
+    matchLabels:
+      app: "{{ .Values.name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.name }}"
+    spec:
+      serviceAccountName: "{{ .Values.name }}-service-account"
+      containers:
+        - name: "{{ .Values.name }}"
+          image: "{{ .Values.deployment.image }}:{{ .Values.deployment.tag }}"
+          readinessProbe:
+            grpc:
+              port: { { .Values.grpc.port } }
+            initialDelaySeconds: 5
+          livenessProbe:
+            grpc:
+              port: { { .Values.grpc.port } }
+            initialDelaySeconds: 10
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "{{ .Values.resources.requests.memory }}"
+              cpu: "{{ .Values.resources.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.resources.limits.memory }}"
+              cpu: "{{ .Values.resources.limits.cpu }}"
+          ports:
+            - containerPort: { { .Values.grpc.port } }
+          # The following environment variables will contain the database host,
+          # user and password to connect to the PostgreSQL instance.
+          env:
+            - name: TRACKER_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: environment
+            # - name: TRACKER_MONITORING_TOKEN
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: "{{ .Values.secret.monitoring }}"
+            #       key: token
+            - name: TRACKER_GRPC_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: grpcHost
+            - name: TRACKER_GRPC_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: grpcPort
+            - name: TRACKER_POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresUser
+            - name: TRACKER_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresPassword
+            - name: TRACKER_POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresPort
+            - name: TRACKER_POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresDB
+            - name: TRACKER_POSTGRES_MIGRATE
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: postgresMigrate
+        - name: cloudsql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.1
+          args:
+            - "--structured-logs"
+            - "--port=5432"
+            - "nawalt:{{ .Values.postgres.region }}:{{ .Values.postgres.instance }}"
+          securityContext:
+            # The default Cloud SQL proxy image runs as the
+            # "nonroot" user and group (uid: 65532) by default.
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 50m
+            limits:
+              memory: 200Mi
+              cpu: 200m
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
