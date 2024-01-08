@@ -30,3 +30,7 @@ grpc:
   host: "0.0.0.0"
   port: 50051
   servicePort: 50051
+
+places:
+  host: "places"
+  port: 80

@@ -41,3 +41,7 @@ postgres:
   port: 5432
   db: tracker
   migrate: true
+
+places:
+  host: "places"
+  port: 80

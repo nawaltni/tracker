@@ -89,6 +89,16 @@ spec:
                 configMapKeyRef:
                   name: "{{ .Values.name }}"
                   key: postgresMigrate
+            - name: TRACKER_PLACES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: placesHost
+            - name: TRACKER_PLACES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.name }}"
+                  key: placesPort
         - name: cloudsql-proxy
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.1
           args:

@@ -11,4 +11,6 @@ data:
   postgresPort: "{{ .Values.postgres.port }}"
   postgresDB: "{{ .Values.postgres.db }}"
   postgresMigrate: "{{ .Values.postgres.migrate }}"
+  placesHost: "{{ .Values.places.host }}"
+  placesPort: "{{ .Values.places.port }}"
   
