@@ -7,10 +7,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Configuration represents the application configuration
-type Configuration struct {
+// Config represents the application config
+type Config struct {
 	Environment string `mapstructure:"environment"`
-	Postgres    struct {
+	// Logging configurations
+	LogConfig Logger `mapstructure:"log_config"`
+	Postgres  struct {
 		Host          string `mapstructure:"host"`
 		Port          int    `mapstructure:"port"`
 		Username      string `mapstructure:"user"`
@@ -18,6 +20,12 @@ type Configuration struct {
 		Database      string `mapstructure:"database"`
 		RunMigrations bool   `mapstructure:"run_migrations"`
 	}
+
+	HTTP struct {
+		Host string `mapstructure:"host"`
+		Port int    `mapstructure:"port"`
+	}
+
 	GRPC struct {
 		Host string `mapstructure:"host"`
 		Port int    `mapstructure:"port"`
@@ -32,7 +40,7 @@ type Places struct {
 }
 
 // LoadConfig loads the configuration from file and environment variables
-func LoadConfig(cmd *cobra.Command) (*Configuration, error) {
+func LoadConfig(cmd *cobra.Command) (*Config, error) {
 	// from the command itself
 	if err := viper.BindPFlags(cmd.Flags()); err != nil {
 		return nil, err
@@ -61,7 +69,7 @@ func LoadConfig(cmd *cobra.Command) (*Configuration, error) {
 		return nil, err
 	}
 
-	config := new(Configuration)
+	config := new(Config)
 	if err := viper.Unmarshal(config); err != nil {
 		return nil, err
 	}

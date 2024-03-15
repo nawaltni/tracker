@@ -26,7 +26,7 @@ type Server struct {
 }
 
 // New creates a new gRPC server for PlacesService
-func New(conf config.Configuration, services *services.Services) (*Server, error) {
+func New(conf config.Config, services *services.Services) (*Server, error) {
 	serverHost := fmt.Sprintf("%s:%d", conf.GRPC.Host, conf.GRPC.Port)
 	conn, err := net.Listen("tcp", serverHost)
 	if err != nil {

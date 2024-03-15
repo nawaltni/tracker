@@ -9,20 +9,20 @@ import (
 // Services contains all services of the application
 type Services struct {
 	UserPositionService domain.UserPositionService
-	Config        config.Configuration
+	Config              config.Config
 }
 
 // NewServices creates a new Services instance
 func NewServices(
-	config config.Configuration, repos *postgres.Repositories,
+	config config.Config, repos *postgres.Repositories,
 	placesClient domain.PlacesClientGRPC, bigqueryClient domain.BigqueryClient,
-	) (*Services, error) {
+) (*Services, error) {
 	userPositionService, err := NewUserPositionService(repos.UserPosition, placesClient, bigqueryClient)
 	if err != nil {
 		return nil, err
 	}
 	return &Services{
-		Config:        config,
+		Config:              config,
 		UserPositionService: userPositionService,
 	}, nil
 }

@@ -1,11 +1,17 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"time"
 
+	"github.com/nawaltni/tracker/api"
 	"github.com/nawaltni/tracker/bigquery"
 	grpcClients "github.com/nawaltni/tracker/clients/grpc"
 	"github.com/nawaltni/tracker/config"
@@ -82,23 +88,53 @@ func run(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// 4. Create Services
+	// 6. Create Services
 	services, err := services.NewServices(*conf, repost, placesClient, bigqueryClient)
 	if err != nil {
 		log.Fatal("Failed to create services: " + err.Error())
 		return
 	}
 
-	// 5. Start gRPC Service
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	apiService := api.New(conf, services)
+
+	// 17. Prepare Graceful shutdown
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", conf.HTTP.Port),
+		Handler: apiService.Router(),
+	}
+
+	go func() {
+		// service connections
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("listen: %s\n", err)
+			return
+		}
+	}()
+
+	// 7. Start gRPC Service
 	server, err := grpc.New(*conf, services)
 	if err != nil {
 		log.Fatal("Failed to create grpc server: " + err.Error())
 		return
 	}
 
-	// 19. Start gRPC Service
+	// 8. Start gRPC Service
 	err = server.Start()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "Could not start grpc server"))
 	}
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	slog.Info("Shutdown Server ...")
+
+	if err := srv.Shutdown(ctx); err != nil {
+		slog.Error("Server Shutdown: %v", err)
+	}
+	slog.Info("Server exiting")
 }
