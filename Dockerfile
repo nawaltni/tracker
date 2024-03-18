@@ -17,12 +17,12 @@ RUN apk update && apk add --no-cache git ca-certificates curl openssh-client
 RUN mkdir /root/.ssh/
 
 # Copy SSH Key
-RUN echo "${DEPLOY_KEY}" > /root/.ssh/id_rsa 
+RUN echo "${DEPLOY_KEY}" > /root/.ssh/id_ed25519
 
 # make sure your domain is accepted
 RUN touch /root/.ssh/known_hosts
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
-RUN chmod 400 ${HOME}/.ssh/id_rsa
+RUN chmod 400 ${HOME}/.ssh/id_ed25519
 
 # Fetch dependencies.
 WORKDIR /code

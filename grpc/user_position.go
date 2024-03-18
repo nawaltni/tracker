@@ -50,7 +50,6 @@ func (s *Server) RecordPosition(ctx context.Context, req *pb.RecordPositionReque
 	}
 
 	err = s.services.UserPositionService.RecordPosition(ctx, userPostion)
-
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to record position")
 	}
@@ -63,7 +62,7 @@ func (s *Server) RecordPosition(ctx context.Context, req *pb.RecordPositionReque
 
 // GetUserPosition retrieves a user's current position.
 func (s *Server) GetUserPosition(ctx context.Context, req *pb.GetUserPositionRequest) (*pb.GetUserPositionResponse, error) {
-	userPosition, err := s.services.UserPositionService.GetUserPosition(ctx, req.UserId)
+	userPosition, err := s.services.UserPositionService.GetUserCurrentPosition(ctx, req.UserId)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get user position")
 	}
@@ -75,7 +74,7 @@ func (s *Server) GetUserPosition(ctx context.Context, req *pb.GetUserPositionReq
 
 // GetUsersPositionByCoordinates retrieves a user's position by coordinates.
 func (s *Server) GetUsersPositionByCoordinates(ctx context.Context, req *pb.GetUsersPositionByCoordinatesRequest) (*pb.GetUsersPositionByCoordinatesResponse, error) {
-	userPositions, err := s.services.UserPositionService.GetUsersPositionByCoordinates(ctx, req.Latitude, req.Longitude, int(req.Distance))
+	userPositions, err := s.services.UserPositionService.GetUsersCurrentPositionByCoordinates(ctx, req.Latitude, req.Longitude, int(req.Distance))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get users' positions by coordinates")
 	}

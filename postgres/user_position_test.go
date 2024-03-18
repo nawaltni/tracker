@@ -184,7 +184,7 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 			r := &UserPositionRepository{
 				client: tt.fields.client,
 			}
-			got, err := r.GetUserPosition(tt.args.ctx, tt.args.userID)
+			got, err := r.GetUserCurrentPosition(tt.args.ctx, tt.args.userID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UserPositionRepository.GetUserPosition() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -205,8 +205,8 @@ func TestUserPositionRepository_GetUserPosition(t *testing.T) {
 }
 
 func createSampleUserPosition(
-	db *gorm.DB, userID string, placeID *string, placeName *string, checkedIn, checkedOut *time.Time) error {
-
+	db *gorm.DB, userID string, placeID *string, placeName *string, checkedIn, checkedOut *time.Time,
+) error {
 	position := &UserPosition{
 		UserID:    userID,
 		Latitude:  40.7128,
@@ -233,7 +233,6 @@ func createSampleUserPosition(
 }
 
 func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
-
 	// Create some test data
 
 	now := time.Now()
@@ -317,7 +316,7 @@ func TestUserPositionRepository_GetUsersPositionByCoordinates(t *testing.T) {
 			r := &UserPositionRepository{
 				client: tt.fields.client,
 			}
-			got, err := r.GetUsersPositionByCoordinates(tt.args.ctx, tt.args.lat, tt.args.lon, tt.args.distance)
+			got, err := r.GetUsersCurrentPositionByCoordinates(tt.args.ctx, tt.args.lat, tt.args.lon, tt.args.distance)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UserPositionRepository.GetUsersPositionByCoordinates() error = %v, wantErr %v", err, tt.wantErr)
 				return

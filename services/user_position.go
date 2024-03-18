@@ -30,7 +30,6 @@ func NewUserPositionService(
 
 // RecordPosition handles the logic for recording a user's position
 func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition domain.UserPosition) error {
-
 	// Call places grpc service to see if the location matches any places
 	res, err := s.placesClientGRPC.IsWithinPlace(ctx, userPosition.Location.Latitude, userPosition.Location.Longitude)
 	if err != nil {
@@ -43,8 +42,8 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 		userPosition.PlaceName = &res.PlaceName
 	}
 
-	// Now we will call the GetUserPosition to know the previous position of the user.
-	knownPosition, err := s.GetUserPosition(ctx, userPosition.UserID)
+	// Now we will call the GetCurrentUserPosition to know the previous position of the user.
+	knownPosition, err := s.GetUserCurrentPosition(ctx, userPosition.UserID)
 	if err != nil && err != domain.ErrNotFound {
 		return fmt.Errorf("error getting user position: %w", err)
 	}
@@ -102,12 +101,27 @@ func stringPointer(s string) *string {
 	return &s
 }
 
-// GetUserPosition retrieves the current position of a user
-func (s *UserPositionService) GetUserPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
-	return s.repo.GetUserPosition(ctx, userID)
+// GetUserCurrentPosition retrieves the current position of a user.
+func (s *UserPositionService) GetUserCurrentPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
+	return s.repo.GetUserCurrentPosition(ctx, userID)
 }
 
-// GetUsersPositionByCoordinates retrieves a list of users' positions close to the given coordinates.
-func (s *UserPositionService) GetUsersPositionByCoordinates(ctx context.Context, lat, long float32, distance int) ([]domain.UserPosition, error) {
-	return s.repo.GetUsersPositionByCoordinates(ctx, lat, long, distance)
+// GetUsersCurrentPositionByCoordinates retrieves the current position of all users within a given distance from a set of coordinates.
+func (s *UserPositionService) GetUsersCurrentPositionByCoordinates(ctx context.Context, lat, long float32, distance int) ([]domain.UserPosition, error) {
+	return s.repo.GetUsersCurrentPositionByCoordinates(ctx, lat, long, distance)
 }
+
+// GetUsersCurrentPositionByDate retrieves a list of users' positions for a given date.
+func (s *UserPositionService) GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]domain.UserPosition, error) {
+	return s.repo.GetUsersCurrentPositionByDate(ctx, date)
+}
+
+// GetUsersCurrentPositionsSince retrieves a list of users' positions since a given time.
+func (s *UserPositionService) GetUsersCurrentPositionsSince(ctx context.Context, t time.Time) ([]domain.UserPosition, error) {
+	return s.repo.GetUsersCurrentPositionSince(ctx, t)
+}
+
+// // GetUserPositionsSince retrieves a user's positions since a given time.
+// func (s *UserPositionService) GetUserPositionsSince(ctx context.Context, userID string, t time.Time) ([]domain.UserPosition, error) {
+// 	return s.bigqueryClient.GetUserPositionsSince(ctx, userID, t)
+// }
