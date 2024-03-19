@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -103,20 +104,29 @@ func (wi WebsocketInstance) handleGetPositions(ctx context.Context, conn *websoc
 	slog.Info("Handling get_positions")
 
 	positions, err := wi.PositionService.GetUsersCurrentPositionByDate(ctx, time.Now())
-
-	// Here you would fetch the latest positions and send them.
-	positionsData, err := json.Marshal(map[string]interface{}{
-		"type":           "position_update",
-		"correlation_id": "your_correlation_id", // You would need to manage correlation IDs appropriately.
-		"data":           positions,
-	})
-
-	response, err := json.Marshal(positionsData)
 	if err != nil {
+		slog.Error("Failed to get positions", "error", err)
 		return err
 	}
 
-	err = conn.Write(ctx, websocket.MessageText, response)
+	if len(positions) == 0 {
+		slog.Info("No current positions found")
+		return nil
+	}
+
+	fmt.Println(positions)
+
+	// Here you would fetch the latest positions and send them.
+	positionsData, err := json.Marshal(map[string]interface{}{
+		"type":           "get_positions_response",
+		"correlation_id": "your_correlation_id", // You would need to manage correlation IDs appropriately.
+		"data":           positions,
+	})
+	if err != nil {
+		return err // Handling errors is crucial.
+	}
+
+	err = conn.Write(ctx, websocket.MessageText, positionsData)
 	if err != nil {
 		return err
 	}
@@ -126,7 +136,7 @@ func (wi WebsocketInstance) handleGetPositions(ctx context.Context, conn *websoc
 
 func (wi WebsocketInstance) handleStreamPositions(ctx context.Context, conn *websocket.Conn, data interface{}) error {
 	slog.Info("Handling stream_positions")
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	refTime := time.Now()
@@ -143,9 +153,14 @@ func (wi WebsocketInstance) handleStreamPositions(ctx context.Context, conn *web
 				continue
 			}
 
+			if len(positions) == 0 {
+				slog.Info("No new positions", "since", refTime.Format(time.RFC3339))
+				continue
+			}
+
 			// Here you would fetch the latest positions and send them.
 			positionsData, err := json.Marshal(map[string]interface{}{
-				"type":           "position_update",
+				"type":           "position_update_response",
 				"correlation_id": "your_correlation_id", // You would need to manage correlation IDs appropriately.
 				"data":           positions,
 			})

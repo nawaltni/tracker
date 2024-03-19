@@ -51,7 +51,7 @@ func NewClient(host string, port int, user, password, dbname string) (*Client, e
 	fmt.Println("Connection successfully")
 
 	client := &Client{
-		db: db,
+		db: db.Debug(),
 
 		connString: connString,
 	}

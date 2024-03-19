@@ -37,7 +37,6 @@ exampleSocket.onopen = () => {
       })
     );
   }, 2000);
-
 };
 
 exampleSocket.onclose = () => {

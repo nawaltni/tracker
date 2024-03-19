@@ -54,13 +54,17 @@ func (r *UserPositionRepository) GetUserCurrentPosition(ctx context.Context, use
 // GetUsersCurrentPositionByDate retrieves a list of users' positions for a given date.
 func (r *UserPositionRepository) GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]domain.UserPosition, error) {
 	var userPositions []UserPosition
-	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").Where("date_trunc('day', updated_at) = ?", date).Order("updated_at DESC").Find(&userPositions).Error
+	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").
+		Where("DATE(updated_at) = DATE(?)", date).
+		Order("updated_at DESC").Find(&userPositions).Error
 	if err != nil {
 		if IsNotFoundError(err) {
 			return nil, domain.ErrNotFound
 		}
 		return nil, fmt.Errorf("error retrieving user positions: %w", err)
 	}
+
+	fmt.Println("userPositions at pg package:", userPositions)
 	userPositionsDomain := make([]domain.UserPosition, len(userPositions))
 	for i, userPosition := range userPositions {
 		userPositionsDomain[i] = *ToDomainUserPosition(userPosition)
@@ -71,7 +75,7 @@ func (r *UserPositionRepository) GetUsersCurrentPositionByDate(ctx context.Conte
 // GetUsersCurrentPositionSince retrieves a list of users' positions since a given time.
 func (r *UserPositionRepository) GetUsersCurrentPositionSince(ctx context.Context, t time.Time) ([]domain.UserPosition, error) {
 	var userPositions []UserPosition
-	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").Where("created_at >= ?", t).Order("created_at DESC").Find(&userPositions).Error
+	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").Where("updated_at >= ?", t).Order("updated_at ASC").Find(&userPositions).Error
 	if err != nil {
 		if IsNotFoundError(err) {
 			return nil, domain.ErrNotFound

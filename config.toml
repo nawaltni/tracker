@@ -19,5 +19,5 @@ host = "0.0.0.0"
 port = 8080
 
 [places]
-host = "places"
-port = 50051
+host = "localhost"
+port = 50052
