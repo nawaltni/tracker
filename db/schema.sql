@@ -10,48 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: tiger; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA tiger;
-
-
---
--- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA tiger_data;
-
-
---
--- Name: topology; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA topology;
-
-
---
--- Name: SCHEMA topology; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
-
-
---
--- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
-
-
---
--- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
-
-
---
 -- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -63,34 +21,6 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
-
-
---
--- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
-
-
---
--- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
-
-
---
--- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
-
-
---
--- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
 
 
 --
@@ -201,6 +131,13 @@ CREATE INDEX idx_user_positions_created_at ON public.user_positions USING btree 
 --
 
 CREATE INDEX idx_user_positions_location ON public.user_positions USING gist (location);
+
+
+--
+-- Name: idx_user_positions_reference; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_user_positions_reference ON public.user_positions USING btree (reference);
 
 
 --

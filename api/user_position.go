@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -12,19 +13,19 @@ import (
 
 // RecordPositionRequest represents the request to record a user's location update.
 type RecordPositionRequest struct {
-	UserID   string `json:"user_id"`
+	UserID   string `json:"userId"`
 	Location struct {
 		Latitude  float32 `json:"latitude"`
 		Longitude float32 `json:"longitude"`
 	} `json:"location"`
 	Timestamp time.Time `json:"timestamp"`
-	ClientID  string    `json:"client_id"`
+	ClientID  string    `json:"clientId"`
 	Metadata  *struct {
-		DeviceID   string  `json:"device_id"`
+		DeviceID   string  `json:"deviceId"`
 		Brand      string  `json:"brand"`
 		Model      string  `json:"model"`
 		Os         string  `json:"os"`
-		AppVersion string  `json:"app_version"`
+		AppVersion string  `json:"appVersion"`
 		Carrier    string  `json:"carrier"`
 		Battery    float64 `json:"battery"`
 	}
@@ -67,6 +68,7 @@ func (a *API) RecordPosition(c *gin.Context) {
 
 	err = a.services.UserPositionService.RecordPosition(c, userPostion)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to record position"})
 		return
 	}

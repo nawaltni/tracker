@@ -30,6 +30,7 @@ type CurrentUserPosition struct {
 type UserPositionRepository interface {
 	Insert(ctx context.Context, userPosition *UserPosition) error
 	GetUserCurrentPosition(ctx context.Context, userID string) (*UserPosition, error)
+	GetUserCurrentPositionByReference(ctx context.Context, reference string) (*UserPosition, error)
 	GetUsersCurrentPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]UserPosition, error)
 	// GetUsersCurrentPositionByDate retrieves a list of users' positions for a given date.
 	GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]UserPosition, error)

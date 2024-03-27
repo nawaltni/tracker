@@ -17,6 +17,9 @@ CREATE TABLE user_positions (
     -- PostGIS geographical point for location (latitude and longitude)
     location GEOMETRY(Point, 4326)
 );
+
+-- Create indexes for reference
+CREATE INDEX idx_user_positions_reference ON user_positions (reference);
 -- Create indexes for user_id and timestamp
 CREATE INDEX idx_user_positions_created_at ON user_positions (created_at);
 -- Create index for location

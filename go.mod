@@ -138,7 +138,7 @@ require (
 require (
 	github.com/Depado/ginprom v1.8.1
 	github.com/gin-contrib/logger v1.1.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.6.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/paulmach/orb v0.10.0
 	github.com/rs/zerolog v1.32.0

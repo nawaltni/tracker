@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/nawaltni/tracker/domain"
 )
 
@@ -42,10 +43,33 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 		userPosition.PlaceName = &res.PlaceName
 	}
 
-	// Now we will call the GetCurrentUserPosition to know the previous position of the user.
-	knownPosition, err := s.GetUserCurrentPosition(ctx, userPosition.UserID)
-	if err != nil && err != domain.ErrNotFound {
-		return fmt.Errorf("error getting user position: %w", err)
+	var knownPosition *domain.UserPosition
+
+	if !IsValidUUID(userPosition.UserID) {
+		knownPosition, err = s.GetUserCurrentPositionByReference(ctx, userPosition.UserID)
+		if err != nil && err != domain.ErrNotFound {
+			return fmt.Errorf("error getting user position: %w", err)
+		}
+
+		fmt.Printf("knownPosition: %+v\n", knownPosition)
+
+		userPosition.Reference = userPosition.UserID
+		if knownPosition == nil {
+			code, err := uuid.NewV7()
+			if err != nil {
+				return fmt.Errorf("error generating uuid: %w", err)
+			}
+			userPosition.UserID = code.String()
+		} else {
+			userPosition.UserID = knownPosition.UserID
+		}
+	} else {
+		// Now we will call the GetCurrentUserPosition to know the previous position of the user.
+		knownPosition, err = s.GetUserCurrentPosition(ctx, userPosition.UserID)
+		if err != nil && err != domain.ErrNotFound {
+			return fmt.Errorf("error getting user position: %w", err)
+		}
+
 	}
 
 	// If the user has no previous position, we will set the knownPosition to the street
@@ -65,6 +89,12 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 	}
 
 	return s.repo.Insert(ctx, &userPosition)
+}
+
+// IsValidUUID checks if a string is a valid UUID
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
 }
 
 // StreetPosition returns a UserPosition object for the street
@@ -104,6 +134,11 @@ func stringPointer(s string) *string {
 // GetUserCurrentPosition retrieves the current position of a user.
 func (s *UserPositionService) GetUserCurrentPosition(ctx context.Context, userID string) (*domain.UserPosition, error) {
 	return s.repo.GetUserCurrentPosition(ctx, userID)
+}
+
+// GetUserCurrentPositionByReference retrieves the current position of a user by reference.
+func (s *UserPositionService) GetUserCurrentPositionByReference(ctx context.Context, reference string) (*domain.UserPosition, error) {
+	return s.repo.GetUserCurrentPositionByReference(ctx, reference)
 }
 
 // GetUsersCurrentPositionByCoordinates retrieves the current position of all users within a given distance from a set of coordinates.
