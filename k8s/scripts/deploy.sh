@@ -2,19 +2,38 @@
 # Deployment script to Production Cluster
 set -e
 
+ACCESS_TOKEN=$DO_PAT # expected to be set in the environment
+if [[ -z "${ACCESS_TOKEN}" ]]; then
+	echo -e "\e[1;31mDigitalOcean Access Token not found\e[0m"
+	echo -e "\e[1;31mPlease authenticate doctl for use with your DigitalOcean account. You can generate a token in the control panel at https://cloud.digitalocean.com/account/api/tokens\e[0m"
+	exit 1
+fi
+
 # Switch based on the environment parameter
 case "$1" in
     development)
-        NAMESPACE="development"
-        # Other variables specific to development environment
+        NAMESPACE="dev"
+        PROJECT=nawalt-dev
+        K8S_CLUSTER=nawalt-dev
+        K8S_ZONE=nyc1
+        VALUES_FILE=values.yaml
+        echo -e "\e[1;34mPreparing to Deploy to \e[33mDevelopment\e[0m"
         ;;
     staging)
         NAMESPACE="staging"
-        # Other variables specific to staging environment
+        PROJECT=nawalt-staging
+        K8S_CLUSTER=nawalt-staging
+        K8S_ZONE=nyc1
+        VALUES_FILE=values.staging.yaml
+        echo -e "\e[1;34mPreparing to Deploy to \e[33mStaging\e[0m"
         ;;
     production)
         NAMESPACE="production"
-        # Other variables specific to production environment
+        PROJECT=nawalt
+        K8S_CLUSTER=nawalt
+        K8S_ZONE=nyc1
+        VALUES_FILE=values.production.yaml
+        echo -e "\e[1;34mPreparing to Deploy to \e[33mProduction\e[0m"
         ;;
     *)
         echo "Invalid environment parameter. Please specify development, staging, or production."
@@ -23,10 +42,6 @@ case "$1" in
 esac
 
 
-GCLOUD_PROJECT=nawalt
-GCLOUD_CLUSTER=nawalt-1
-GCLOUD_ZONE=us-east1-b
-
 # provide a version as an argument
 commit=$(git rev-parse --short HEAD)
 tstamp=$(date +"%Y%m%d%H%M%S")
@@ -34,7 +49,7 @@ tstamp=$(date +"%Y%m%d%H%M%S")
 version="$commit-$tstamp"
 
 echo -e "\e[1;34mPreparing to Deploy to \e[33m$NAMESPACE\e[0m"
-IMAGE=us-east1-docker.pkg.dev/nawalt/nawalt/tracker
+IMAGE=registry.digitalocean.com/nawalt/tracker
 IMAGE_NAME=$IMAGE:$version
 
 echo -e "\e[1;34mPreparing image \e[33m$IMAGE_NAME\e[0m"
@@ -46,7 +61,7 @@ echo -e "\e[1;31mWarning: This should only be used in an emergency.\e[0m"
 read -p "Are you sure you want to deploy from your computer?(y/n)" answer
 case ${answer:0:1} in
     y|Y )
-        DEPLOY_KEY=$(cat ~/.ssh/id_rsa)
+        DEPLOY_TOKEN=$(cat ~/.ssh/id_ed25519)
     ;;
     * )
         echo -e "\e[1;32mDeployment stopped\e[0m";
@@ -55,23 +70,36 @@ case ${answer:0:1} in
 esac
 
 
-gcloud config set project $GCLOUD_PROJECT
-gcloud container clusters get-credentials $GCLOUD_CLUSTER --zone=$GCLOUD_ZONE --project $GCLOUD_PROJECT
-gcloud auth configure-docker --quiet us-east1-docker.pkg.dev
+# Authenticate with DigitalOcean
+echo -e "\e[1;34mAuthenticating with DigitalOcean\e[0m"
+doctl kubernetes cluster kubeconfig save $K8S_CLUSTER -t $ACCESS_TOKEN
+
+# Setting up Docker config
+echo -e "\e[1;34mSetting up Docker config\e[0m"
+doctl registry login -t $ACCESS_TOKEN
 
 # build a container
 echo -e "\e[1;34mBuilding image\e[0m"
-docker build -t $IMAGE_NAME --build-arg DEPLOY_KEY="$DEPLOY_KEY" .
-if [ $? -eq 0 ]; then
-	echo -e "\e[1;32mBuild complete\e[0m"
-else
-	echo -e "\e[1;31mBuild failed\e[0m"
-	exit 1
+
+build_command="docker build -t $IMAGE_NAME --build-arg DEPLOY_USER=\"$DEPLOY_USER\" --build-arg DEPLOY_TOKEN=\"$DEPLOY_TOKEN\" ."
+push_command="docker push $IMAGE_NAME"
+
+# Check architecture and adjust build command if necessary
+if [[ $(uname -m) == 'arm64' ]]; then
+    build_command="docker buildx build --ssh default --platform linux/amd64 -t $IMAGE_NAME  --push ."
+    push_command="" # No need to push separately for buildx as --push is used
 fi
 
-# push to GCR
-echo -e "\e[1;34mPushing image to GCR\e[0m"
-docker push $IMAGE_NAME
+echo $build_command
+# Execute build
+eval $build_command
+echo -e "\e[1;32mBuild complete\e[0m"
+
+# Execute push if not using buildx (as buildx already includes push if --push is used)
+if [[ -n $push_command ]]; then
+    eval $push_command
+fi
+
 
 if [ $? -eq 0 ]; then
 	echo -e "\e[1;32mImage pushed\e[0m"
@@ -83,12 +111,12 @@ fi
 echo -e "\e[1;34mDeploying tracker\e[0m"
 
 helm upgrade --install \
-    --values ./k8s/helm/tracker/values.$1.yaml \
+    --values k8s/helm/tracker/$VALUES_FILE \
     --set deployment.image=$IMAGE \
     --set deployment.tag=$version \
     tracker ./k8s/helm/tracker \
-    -n $1
+    -n $NAMESPACE
 echo -e "\e[1;32mtracker deployed\e[0m"
 
 # check 
-kubectl get pods -n $1
+kubectl get pods -n $NAMESPACE

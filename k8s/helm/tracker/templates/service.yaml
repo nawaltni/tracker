@@ -8,9 +8,13 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - name: tcp
+    - name: grpc
       protocol: TCP
       port: {{ .Values.grpc.servicePort }}
       targetPort: {{ .Values.grpc.port }}
+    - name: http
+      protocol: TCP
+      port: {{ .Values.http.servicePort }}
+      targetPort: {{ .Values.http.port }}
   selector:
     app: "{{ .Values.name }}"

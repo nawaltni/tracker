@@ -2,18 +2,27 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/cluster-issuer: cert-manager-global
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
-  name: "{{ .Values.name }}"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: {{ .Values.name | quote }}
 spec:
   ingressClassName: nginx
   rules:
-  - host: "{{ .Values.ingress.domain }}"
+  - host: {{ .Values.ingress.domain | quote }}
     http:
       paths:
       - path: /nawalt.tracker.v1.TrackingService
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ .Values.name }}"
+            port:
+              number: {{ .Values.servicePort }}
+      - path: /api/tracker(/|$)(.*)
         pathType: Prefix
         backend:
           service:

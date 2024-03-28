@@ -1,23 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.name }}"
+  name: {{ .Values.name | quote }}
   labels:
-    app: "{{ .Values.name }}"
+    app: {{ .Values.name | quote }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: "{{ .Values.name }}"
+      app: {{ .Values.name | quote }}
   template:
     metadata:
       labels:
-        app: "{{ .Values.name }}"
+        app: {{ .Values.name | quote }}
     spec:
-      serviceAccountName: "{{ .Values.name }}-service-account"
       containers:
-        - name: "{{ .Values.name }}"
-          image: "{{ .Values.deployment.image }}:{{ .Values.deployment.tag }}"
+        - name: {{ .Values.name | quote }}
+          image: {{ printf "%s:%s" .Values.deployment.image .Values.deployment.tag | quote }}
           readinessProbe:
             grpc:
               port: {{ .Values.grpc.port }}
@@ -29,20 +28,32 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "{{ .Values.resources.requests.memory }}"
-              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: {{ .Values.resources.requests.memory | quote }}
+              cpu: {{ .Values.resources.requests.cpu | quote }}
             limits:
-              memory: "{{ .Values.resources.limits.memory }}"
-              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: {{ .Values.resources.limits.memory | quote }}
+              cpu: {{ .Values.resources.limits.cpu | quote }}
           ports:
+            - containerPort: {{ .Values.http.port }}
             - containerPort: {{ .Values.grpc.port }}
+
+
+          volumeMounts:
+            - name: tracker-gcloud-service-account
+              mountPath: /secrets/
+              readOnly: true
+            - name: pg-ca-certificate
+              mountPath: "/etc/ssl/certs"
+              readOnly: true
           # The following environment variables will contain the database host,
           # user and password to connect to the PostgreSQL instance.
           env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/service_account.json
             - name: TRACKER_ENVIRONMENT
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: environment
             # - name: TRACKER_MONITORING_TOKEN
             #   valueFrom:
@@ -52,70 +63,61 @@ spec:
             - name: TRACKER_GRPC_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: grpcHost
             - name: TRACKER_GRPC_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: grpcPort
             - name: TRACKER_POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresUser
             - name: TRACKER_POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresPassword
             - name: TRACKER_POSTGRES_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresHost
             - name: TRACKER_POSTGRES_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresPort
             - name: TRACKER_POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresDB
             - name: TRACKER_POSTGRES_MIGRATE
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: postgresMigrate
             - name: TRACKER_PLACES_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: placesHost
             - name: TRACKER_PLACES_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ .Values.name }}"
+                  name: {{ .Values.name | quote }}
                   key: placesPort
-        - name: cloudsql-proxy
-          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.1
-          args:
-            - "--structured-logs"
-            - "--port=5432"
-            - "nawalt:{{ .Values.postgres.region }}:{{ .Values.postgres.instance }}"
-          securityContext:
-            # The default Cloud SQL proxy image runs as the
-            # "nonroot" user and group (uid: 65532) by default.
-            runAsNonRoot: true
-          resources:
-            requests:
-              memory: 200Mi
-              cpu: 50m
-            limits:
-              memory: 200Mi
-              cpu: 200m
+      
+      volumes:
+        - name: tracker-gcloud-service-account
+          secret:
+            secretName: tracker-gcloud-service-account
+        - name: pg-ca-certificate
+          secret:
+            secretName: {{ printf "%s-%s" .Values.name "pg-ca-certificate" | quote}}
 
   strategy:
     type: RollingUpdate

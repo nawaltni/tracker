@@ -4,7 +4,7 @@ deployment:
 
 name: tracker
 
-replicas: 2
+replicas: 1
 
 resources:
   requests:
@@ -19,7 +19,7 @@ port: 8080
 servicePort: 80
 
 secret:
-  create: false
+  create: yes
   monitoring: "apps-metrics"
 
 env:
@@ -31,6 +31,22 @@ grpc:
   port: 50051
   servicePort: 50051
 
+http:
+  host: "0.0.0.0"
+  port: 8080
+  servicePort: 80
+
 places:
   host: "places"
   port: 80
+
+ingress:
+  domain: dev.nawalt.com
+
+postgres:
+  host: nawalt-dev-do-user-1811587-0.c.db.ondigitalocean.com
+  port: 25060
+  user: tracker
+  db: tracker
+  ssl: true
+  migrate: true
