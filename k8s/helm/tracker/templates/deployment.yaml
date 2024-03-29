@@ -100,6 +100,11 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.name | quote }}
                   key: postgresMigrate
+            - name: TRACKER_POSTGRES_SSL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.name | quote }}
+                  key: postgresSSL
             - name: TRACKER_PLACES_HOST
               valueFrom:
                 configMapKeyRef:

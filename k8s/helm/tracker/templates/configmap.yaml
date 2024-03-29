@@ -1,16 +1,17 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Values.name }}"
+  name: {{ .Values.name | quote }}
 data:
-  environment: "{{ .Values.env.config.environment }}"
-  grpcHost: "{{ .Values.grpc.host }}"
-  grpcPort: "{{ .Values.grpc.port }}"
-  postgresUser: "{{ .Values.postgres.user }}"
-  postgresHost: "{{ .Values.postgres.host }}"
-  postgresPort: "{{ .Values.postgres.port }}"
-  postgresDB: "{{ .Values.postgres.db }}"
-  postgresMigrate: "{{ .Values.postgres.migrate }}"
-  placesHost: "{{ .Values.places.host }}"
-  placesPort: "{{ .Values.places.port }}"
+  environment: {{ .Values.env.config.environment | quote }}
+  grpcHost: {{ .Values.grpc.host | quote }}
+  grpcPort: {{ .Values.grpc.port | quote }}
+  postgresUser: {{ .Values.postgres.user | quote }}
+  postgresHost: {{ .Values.postgres.host | quote }}
+  postgresPort: {{ .Values.postgres.port | quote }}
+  postgresDB: {{ .Values.postgres.db | quote }}
+  postgresMigrate: {{ .Values.postgres.migrate | quote }}
+  postgresSSL: {{ .Values.postgres.ssl | quote }}
+  placesHost: {{ .Values.places.host | quote }}
+  placesPort: {{ .Values.places.port | quote }}
   

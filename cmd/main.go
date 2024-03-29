@@ -51,7 +51,7 @@ func run(cmd *cobra.Command, args []string) {
 	fmt.Printf("config: %+v\n", conf)
 
 	// 2. Create Postgres Client
-	pgClient, err := postgres.NewClient(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database)
+	pgClient, err := postgres.NewClient(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database, pConfig.SSL)
 	if err != nil {
 		log.Fatal("Failed to create postgres client: " + err.Error())
 		return
@@ -59,7 +59,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// 3. Migration
 	if pConfig.RunMigrations {
-		err = postgres.MigrateUp(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database)
+		err = postgres.MigrateUp(pConfig.Host, pConfig.Port, pConfig.Username, pConfig.Password, pConfig.Database, pConfig.SSL)
 		if err != nil {
 			log.Fatal("Failed to run migrations: " + err.Error())
 			return

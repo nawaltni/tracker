@@ -19,6 +19,7 @@ type Config struct {
 		Password      string `mapstructure:"password"`
 		Database      string `mapstructure:"database"`
 		RunMigrations bool   `mapstructure:"run_migrations"`
+		SSL           bool   `mapstructure:"ssl"`
 	}
 
 	HTTP struct {

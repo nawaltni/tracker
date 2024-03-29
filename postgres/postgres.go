@@ -20,10 +20,15 @@ type Client struct {
 }
 
 // NewClient starts a connection with db using gorm.
-func NewClient(host string, port int, user, password, dbname string) (*Client, error) {
+func NewClient(host string, port int, user, password, dbname string, ssl bool) (*Client, error) {
 	// Connection string
-	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s  sslmode=disable",
+	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require sslrootcert=/etc/ssl/certs/ca.crt",
 		host, port, user, password, dbname)
+
+	if !ssl {
+		connString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			host, port, user, password, dbname)
+	}
 
 	db, err := gorm.Open(postgres.Open(connString))
 	if err != nil {
@@ -74,12 +79,18 @@ func NewRepositories(client *Client) (*Repositories, error) {
 }
 
 // MigrateUp runs migrations
-func MigrateUp(host string, port int, user, password, dbname string) error {
+func MigrateUp(host string, port int, user, password, dbname string, ssl bool	) error {
 	// Connection string
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+	connString := fmt.Sprintf(`postgres://%s:%s@%s:%d/%s?sslmode=require&sslrootcert=\/etc\/ssl\/certs\/ca.crt`,
 		user, url.QueryEscape(password), host, port, dbname)
 
+	if !ssl {
+		connString = fmt.Sprintf(`postgres://%s:%s@%s:%d/%s?sslmode=disable`,
+			user, url.QueryEscape(password), host, port, dbname)
+	}
+
 	u, _ := url.Parse(connString)
+	fmt.Println("ssl is", u.Query().Get("sslrootcert"))
 	dbm := dbmate.New(u)
 
 	dir, err := os.Getwd()
