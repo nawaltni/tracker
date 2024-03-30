@@ -43,7 +43,7 @@ spec:
               mountPath: /secrets/
               readOnly: true
             - name: pg-ca-certificate
-              mountPath: "/etc/ssl/certs"
+              mountPath: "/etc/ssl/pg"
               readOnly: true
           # The following environment variables will contain the database host,
           # user and password to connect to the PostgreSQL instance.

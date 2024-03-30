@@ -38,7 +38,7 @@ http:
 
 places:
   host: "places"
-  port: 80
+  port: 50051
 
 ingress:
   domain: dev.nawalt.com

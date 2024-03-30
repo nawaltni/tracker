@@ -22,7 +22,7 @@ type Client struct {
 // NewClient starts a connection with db using gorm.
 func NewClient(host string, port int, user, password, dbname string, ssl bool) (*Client, error) {
 	// Connection string
-	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require sslrootcert=/etc/ssl/certs/ca.crt",
+	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require sslrootcert=/etc/ssl/pg/ca.crt",
 		host, port, user, password, dbname)
 
 	if !ssl {
@@ -79,9 +79,9 @@ func NewRepositories(client *Client) (*Repositories, error) {
 }
 
 // MigrateUp runs migrations
-func MigrateUp(host string, port int, user, password, dbname string, ssl bool	) error {
+func MigrateUp(host string, port int, user, password, dbname string, ssl bool) error {
 	// Connection string
-	connString := fmt.Sprintf(`postgres://%s:%s@%s:%d/%s?sslmode=require&sslrootcert=\/etc\/ssl\/certs\/ca.crt`,
+	connString := fmt.Sprintf(`postgres://%s:%s@%s:%d/%s?sslmode=require&sslrootcert=\/etc\/ssl\/pg\/ca.crt`,
 		user, url.QueryEscape(password), host, port, dbname)
 
 	if !ssl {
