@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ type RecordPositionRequest struct {
 		Carrier    string  `json:"carrier"`
 		Battery    float64 `json:"battery"`
 	}
+	RefID string `json:"refId"`
 }
 
 // RecordPosition records a user's location update.
@@ -73,5 +75,72 @@ func (a *API) RecordPosition(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Position recorded successfully"})
+	c.JSON(http.StatusOK, gin.H{"id": uid, "refId": req.RefID})
+}
+
+// RecordPositionBatch records a batch of user's location updates.
+func (a *API) RecordPositionBatch(c *gin.Context) {
+	var req []RecordPositionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	out := map[string]string{}
+
+	for _, r := range req {
+		// get the id from the request metadata
+		// if the id is not present, generate a new one
+		uid, err := uuid.NewV7()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate uuid"})
+			return
+		}
+
+		userPostion := domain.UserPosition{
+			UserID:    r.UserID,
+			Reference: uid.String(),
+			Location: domain.GeoPoint{
+				Latitude:  r.Location.Latitude,
+				Longitude: r.Location.Longitude,
+			},
+			CreatedAt: r.Timestamp,
+			PhoneMeta: domain.PhoneMeta{
+				DeviceID:   r.Metadata.DeviceID,
+				Brand:      r.Metadata.Brand,
+				Model:      r.Metadata.Model,
+				OS:         r.Metadata.Os,
+				AppVersion: r.Metadata.AppVersion,
+				Carrier:    r.Metadata.Carrier,
+				Battery:    int(r.Metadata.Battery),
+			},
+		}
+
+		err = a.services.UserPositionService.RecordPosition(c, userPostion)
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to record position"})
+			return
+		}
+
+		out[r.RefID] = uid.String()
+
+	}
+	c.JSON(http.StatusOK, mapToUserPositionBatchResponse(out))
+}
+
+type UserPositionBatchResponse struct {
+	RefID string `json:"refId"`
+	ID    string `json:"id"`
+}
+
+func mapToUserPositionBatchResponse(m map[string]string) []UserPositionBatchResponse {
+	var s []UserPositionBatchResponse
+	for k, v := range m {
+		s = append(s, UserPositionBatchResponse{RefID: k, ID: v})
+	}
+	sort.Slice(s, func(i, j int) bool {
+		return s[i].RefID < s[j].RefID
+	})
+	return s
 }

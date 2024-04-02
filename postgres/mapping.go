@@ -25,7 +25,8 @@ func ToModelUserPosition(in *domain.UserPosition) UserPosition {
 			Carrier:    in.PhoneMeta.Carrier,
 			Battery:    in.PhoneMeta.Battery,
 		},
-		Reference: in.Reference,
+		Reference:     in.Reference,
+		BackendUserID: in.BackendUserID,
 	}
 
 	point := orb.Point{float64(in.Location.Longitude), float64(in.Location.Latitude)}
@@ -52,7 +53,8 @@ func ToDomainUserPosition(in UserPosition) *domain.UserPosition {
 			Carrier:    in.PhoneMeta.Carrier,
 			Battery:    in.PhoneMeta.Battery,
 		},
-		Reference: in.Reference,
+		Reference:     in.Reference,
+		BackendUserID: in.BackendUserID,
 	}
 	// Conditional assignment for optional fields
 	if in.CheckedIn != nil {

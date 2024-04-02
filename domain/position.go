@@ -17,6 +17,7 @@ type UserPosition struct {
 	CheckedIn  *time.Time `json:"checked_in,omitempty"`  // Optional, time when user checked into a Place
 	CheckedOut *time.Time `json:"checked_out,omitempty"` // Optional, time when user checked out of a Place
 	PhoneMeta  PhoneMeta  `json:"phone_meta"`            // Metadata about the phone reporting the position
+	BackendUserID string  `json:"backend_user_id"`
 }
 
 // CurrentUserPosition represents the current position of a user.
@@ -30,7 +31,7 @@ type CurrentUserPosition struct {
 type UserPositionRepository interface {
 	Insert(ctx context.Context, userPosition *UserPosition) error
 	GetUserCurrentPosition(ctx context.Context, userID string) (*UserPosition, error)
-	GetUserCurrentPositionByReference(ctx context.Context, reference string) (*UserPosition, error)
+	GetUserCurrentPositionByBackendID(ctx context.Context, id string) (*UserPosition, error)
 	GetUsersCurrentPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]UserPosition, error)
 	// GetUsersCurrentPositionByDate retrieves a list of users' positions for a given date.
 	GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]UserPosition, error)

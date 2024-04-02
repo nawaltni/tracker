@@ -51,10 +51,10 @@ func (r *UserPositionRepository) GetUserCurrentPosition(ctx context.Context, use
 	return pos, err
 }
 
-// GetUserCurrentPositionByReference retrieves a user's most recent position from the database by reference.
-func (r *UserPositionRepository) GetUserCurrentPositionByReference(ctx context.Context, reference string) (*domain.UserPosition, error) {
+// GetUserCurrentPositionByBackendID retrieves a user's most recent position from the database by backend user id.
+func (r *UserPositionRepository) GetUserCurrentPositionByBackendID(ctx context.Context, reference string) (*domain.UserPosition, error) {
 	var userPosition UserPosition
-	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").Where("reference = ?", reference).Order("created_at DESC").First(&userPosition).Error
+	err := r.client.db.WithContext(ctx).Preload("PhoneMeta").Where("backend_user_id = ?", reference).Order("created_at DESC").First(&userPosition).Error
 	if err != nil {
 		if IsNotFoundError(err) {
 			return nil, domain.ErrNotFound

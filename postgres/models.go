@@ -12,18 +12,19 @@ import (
 )
 
 type UserPosition struct {
-	UserID     string `gorm:"primary_key"`
-	Reference  string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	Latitude   float32
-	Longitude  float32
-	PlaceID    *string
-	PlaceName  *string
-	CheckedIn  *time.Time
-	CheckedOut *time.Time
-	Location   GeoPoint
-	PhoneMeta  PhoneMeta `gorm:"foreignKey:user_id"`
+	UserID        string `gorm:"primary_key"`
+	Reference     string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Latitude      float32
+	Longitude     float32
+	PlaceID       *string
+	PlaceName     *string
+	CheckedIn     *time.Time
+	CheckedOut    *time.Time
+	Location      GeoPoint
+	PhoneMeta     PhoneMeta `gorm:"foreignKey:user_id"`
+	BackendUserID string
 }
 
 type PhoneMeta struct {
@@ -51,8 +52,8 @@ func (g GeoPoint) GormDataType() string {
 func (g GeoPoint) GormDBDataType() string {
 	return "geometry(Point, 4326)"
 }
-func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 
+func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 	return clause.Expr{
 		SQL:  "ST_GeomFromEWKB(?)",
 		Vars: []interface{}{ewkb.Value(g.Point, 4326)},
@@ -60,7 +61,6 @@ func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 }
 
 func (g *GeoPoint) Scan(input interface{}) error {
-
 	var in []byte
 	switch v := input.(type) {
 	case []byte:

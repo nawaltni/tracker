@@ -46,14 +46,14 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 	var knownPosition *domain.UserPosition
 
 	if !IsValidUUID(userPosition.UserID) {
-		knownPosition, err = s.GetUserCurrentPositionByReference(ctx, userPosition.UserID)
+		knownPosition, err = s.GetUserCurrentPositionByBackendID(ctx, userPosition.UserID)
 		if err != nil && err != domain.ErrNotFound {
 			return fmt.Errorf("error getting user position: %w", err)
 		}
 
 		fmt.Printf("knownPosition: %+v\n", knownPosition)
 
-		userPosition.Reference = userPosition.UserID
+		userPosition.BackendUserID = userPosition.UserID
 		if knownPosition == nil {
 			code, err := uuid.NewV7()
 			if err != nil {
@@ -136,9 +136,9 @@ func (s *UserPositionService) GetUserCurrentPosition(ctx context.Context, userID
 	return s.repo.GetUserCurrentPosition(ctx, userID)
 }
 
-// GetUserCurrentPositionByReference retrieves the current position of a user by reference.
-func (s *UserPositionService) GetUserCurrentPositionByReference(ctx context.Context, reference string) (*domain.UserPosition, error) {
-	return s.repo.GetUserCurrentPositionByReference(ctx, reference)
+// GetUserCurrentPositionByBackendID retrieves the current position of a user by reference.
+func (s *UserPositionService) GetUserCurrentPositionByBackendID(ctx context.Context, reference string) (*domain.UserPosition, error) {
+	return s.repo.GetUserCurrentPositionByBackendID(ctx, reference)
 }
 
 // GetUsersCurrentPositionByCoordinates retrieves the current position of all users within a given distance from a set of coordinates.

@@ -84,7 +84,8 @@ CREATE TABLE public.user_positions (
     place_name text,
     checked_in timestamp with time zone,
     checked_out timestamp with time zone,
-    location public.geometry(Point,4326)
+    location public.geometry(Point,4326),
+    backend_user_id character varying(255) NOT NULL
 );
 
 
@@ -141,6 +142,13 @@ CREATE INDEX idx_user_positions_reference ON public.user_positions USING btree (
 
 
 --
+-- Name: user_positions_backend_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_positions_backend_user_id_index ON public.user_positions USING btree (backend_user_id);
+
+
+--
 -- Name: phone_meta phone_meta_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -166,4 +174,5 @@ ALTER TABLE ONLY public.phone_meta
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20231107030909');
+    ('20231107030909'),
+    ('20240402013652');
