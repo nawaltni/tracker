@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
+	"github.com/nawaltni/tracker/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -61,13 +62,15 @@ func NewClient(host string, port int, user, password, dbname string) (*Client, e
 
 // Repositories contains all repositories of the application
 type Repositories struct {
-	UserPosition *UserPositionRepository
+	UserPosition domain.UserPositionRepository
+	TimeTracking domain.TimeTrackingRepository
 }
 
 // NewRepositories creates new repositories
 func NewRepositories(client *Client) (*Repositories, error) {
 	repos := &Repositories{
 		UserPosition: NewUserPositionRepository(client),
+		TimeTracking: NewTimeTrackingRepository(client),
 	}
 
 	return repos, nil

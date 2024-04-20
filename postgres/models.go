@@ -7,6 +7,7 @@ import (
 
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/encoding/ewkb"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -51,8 +52,8 @@ func (g GeoPoint) GormDataType() string {
 func (g GeoPoint) GormDBDataType() string {
 	return "geometry(Point, 4326)"
 }
-func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 
+func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 	return clause.Expr{
 		SQL:  "ST_GeomFromEWKB(?)",
 		Vars: []interface{}{ewkb.Value(g.Point, 4326)},
@@ -60,7 +61,6 @@ func (g GeoPoint) GormValue(ctx context.Context, db *gorm.DB) clause.Expr {
 }
 
 func (g *GeoPoint) Scan(input interface{}) error {
-
 	var in []byte
 	switch v := input.(type) {
 	case []byte:
@@ -79,3 +79,24 @@ func (g *GeoPoint) Scan(input interface{}) error {
 
 	return nil
 }
+
+type TimeTrackingSession struct {
+	SessionID         string `gorm:"primary_key"`
+	UserID            string
+	Status            TimeTrackingStatus
+	CheckedInTime     time.Time
+	CheckedOutTime    *time.Time
+	Breaks            []TimeTrackingBreak `gorm:"foreignkey:SessionID"`
+	TotalWorkTime     datatypes.Time
+	TotalBreakTime    datatypes.Time
+	LastKnownLocation GeoPoint
+}
+
+type TimeTrackingBreak struct {
+	BreakID   string `gorm:"primary_key"`
+	SessionID string
+	StartTime time.Time
+	EndTime   *time.Time
+}
+
+type TimeTrackingStatus int
