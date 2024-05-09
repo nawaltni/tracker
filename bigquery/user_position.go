@@ -10,6 +10,7 @@ type UserPosition struct {
 	UUID       string                 `bigquery:"uuid"`
 	CreatedAt  time.Time              `bigquery:"created_at"`
 	UserID     string                 `bigquery:"user_id"`
+	Name       string                 `bigquery:"name"`
 	Location   string                 `bigquery:"location"`
 	PlaceID    bigquery.NullString    `bigquery:"place_id"`
 	PlaceName  bigquery.NullString    `bigquery:"place_name"`

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +16,7 @@ type UserPositionService struct {
 	placesClientGRPC domain.PlacesClientGRPC
 	authClientGRPC   domain.AuthClientGRPC
 	bigqueryClient   domain.BigqueryClient
+	userCache        domain.UserCache
 }
 
 // NewUserPositionService creates a new UserPositionService
@@ -23,12 +25,14 @@ func NewUserPositionService(
 	placesClient domain.PlacesClientGRPC,
 	authClient domain.AuthClientGRPC,
 	bigqueryClient domain.BigqueryClient,
+	userCache domain.UserCache,
 ) (*UserPositionService, error) {
 	return &UserPositionService{
 		repo:             repo,
 		placesClientGRPC: placesClient,
 		authClientGRPC:   authClient,
 		bigqueryClient:   bigqueryClient,
+		userCache:        userCache,
 	}, nil
 }
 
@@ -49,23 +53,24 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 	var knownPosition *domain.UserPosition
 
 	if !IsValidUUID(userPosition.UserID) {
+		backendID, err := strconv.Atoi(userPosition.UserID)
+		if err != nil {
+			return fmt.Errorf("error converting user id to int: %w", err)
+		}
+
 		knownPosition, err = s.GetUserCurrentPositionByBackendID(ctx, userPosition.UserID)
 		if err != nil && err != domain.ErrNotFound {
 			return fmt.Errorf("error getting user position: %w", err)
 		}
 
-		fmt.Printf("knownPosition: %+v\n", knownPosition)
+		user, err := s.authClientGRPC.GetUserByBackendID(ctx, backendID)
+		if err != nil {
+			return fmt.Errorf("error getting user by backend id: %w", err)
+		}
 
 		userPosition.BackendUserID = userPosition.UserID
-		if knownPosition == nil {
-			code, err := uuid.NewV7()
-			if err != nil {
-				return fmt.Errorf("error generating uuid: %w", err)
-			}
-			userPosition.UserID = code.String()
-		} else {
-			userPosition.UserID = knownPosition.UserID
-		}
+		userPosition.UserID = user.ID
+
 	} else {
 		// Now we will call the GetCurrentUserPosition to know the previous position of the user.
 		knownPosition, err = s.GetUserCurrentPosition(ctx, userPosition.UserID)
@@ -151,7 +156,25 @@ func (s *UserPositionService) GetUsersCurrentPositionByCoordinates(ctx context.C
 
 // GetUsersCurrentPositionByDate retrieves a list of users' positions for a given date.
 func (s *UserPositionService) GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]domain.UserPosition, error) {
-	return s.repo.GetUsersCurrentPositionByDate(ctx, date)
+	position, err := s.repo.GetUsersCurrentPositionByDate(ctx, date)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range position {
+		backendID, err := strconv.Atoi(position[i].BackendUserID)
+		if err != nil {
+			return nil, err
+		}
+		user, err := s.GetUserByBackendID(ctx, backendID)
+		if err != nil {
+			return nil, err
+		}
+
+		position[i].Name = user.Name
+	}
+
+	return position, nil
 }
 
 // GetUsersCurrentPositionsSince retrieves a list of users' positions since a given time.
@@ -159,7 +182,20 @@ func (s *UserPositionService) GetUsersCurrentPositionsSince(ctx context.Context,
 	return s.repo.GetUsersCurrentPositionSince(ctx, t)
 }
 
-// // GetUserPositionsSince retrieves a user's positions since a given time.
-// func (s *UserPositionService) GetUserPositionsSince(ctx context.Context, userID string, t time.Time) ([]domain.UserPosition, error) {
-// 	return s.bigqueryClient.GetUserPositionsSince(ctx, userID, t)
-// }
+// GetUserByBackendID retrieves a user by backend ID. It first checks the cache and then the auth service.
+func (s *UserPositionService) GetUserByBackendID(ctx context.Context, id int) (*domain.User, error) {
+	user := s.userCache.Get(id)
+	if user != nil {
+		// return value from cache
+		return user, nil
+	}
+
+	user, err := s.authClientGRPC.GetUserByBackendID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	s.userCache.Set(id, *user)
+
+	return user, nil
+}

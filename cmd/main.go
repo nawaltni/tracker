@@ -13,6 +13,7 @@ import (
 
 	"github.com/nawaltni/tracker/api"
 	"github.com/nawaltni/tracker/bigquery"
+	"github.com/nawaltni/tracker/cache"
 	grpcClients "github.com/nawaltni/tracker/clients/grpc"
 	"github.com/nawaltni/tracker/config"
 	"github.com/nawaltni/tracker/grpc"
@@ -88,15 +89,18 @@ func run(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// 5. Create Bigquery Client
+	// 6. Create User Cache
+	userCache := cache.NewUserCache()
+
+	// 7. Create Bigquery Client
 	bigqueryClient, err := bigquery.NewClient("nawalt")
 	if err != nil {
 		log.Fatal("Failed to create bigquery client: " + err.Error())
 		return
 	}
 
-	// 6. Create Services
-	services, err := services.NewServices(*conf, repost, placesClient, authClient, bigqueryClient)
+	// 8. Create Services
+	services, err := services.NewServices(*conf, repost, placesClient, authClient, bigqueryClient, userCache)
 	if err != nil {
 		log.Fatal("Failed to create services: " + err.Error())
 		return
@@ -106,7 +110,7 @@ func run(cmd *cobra.Command, args []string) {
 	defer cancel()
 	apiService := api.New(conf, services)
 
-	// 17. Prepare Graceful shutdown
+	// 9. Prepare Graceful shutdown
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", conf.HTTP.Port),
 		Handler: apiService.Router(),
@@ -120,14 +124,14 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	}()
 
-	// 7. Start gRPC Service
+	// 10. Start gRPC Service
 	server, err := grpc.New(*conf, services)
 	if err != nil {
 		log.Fatal("Failed to create grpc server: " + err.Error())
 		return
 	}
 
-	// 8. Start gRPC Service
+	// 11. Start gRPC Service
 	err = server.Start()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "Could not start grpc server"))

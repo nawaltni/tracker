@@ -19,7 +19,7 @@ port: 8080
 servicePort: 80
 
 secret:
-  create: yes
+  create: false
   monitoring: "apps-metrics"
 
 env:

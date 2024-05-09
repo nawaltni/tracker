@@ -13,6 +13,7 @@ func mapToUserPosition(in domain.UserPosition) UserPosition {
 		CreatedAt: in.CreatedAt,
 		UserID:    in.UserID,
 		Location:  in.Location.String(),
+		Name:      in.Name,
 	}
 
 	if in.PlaceID != nil {
@@ -78,6 +79,7 @@ func mapToDomainUserPosition(in UserPosition) domain.UserPosition {
 		CreatedAt: in.CreatedAt,
 		UserID:    in.UserID,
 		Location:  mapDomainLocationFromString(in.Location),
+		Name:      in.Name,
 	}
 
 	if in.PlaceID.Valid {

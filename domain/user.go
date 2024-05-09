@@ -27,3 +27,9 @@ type User struct {
 type AuthClientGRPC interface {
 	GetUserByBackendID(ctx context.Context, id int) (*User, error)
 }
+
+// UserCache is the interface that defines the methods to interact with the user cache
+type UserCache interface {
+	Get(key int) *User
+	Set(key int, value User)
+}

@@ -18,8 +18,9 @@ func NewServices(
 	placesClient domain.PlacesClientGRPC,
 	authClient domain.AuthClientGRPC,
 	bigqueryClient domain.BigqueryClient,
+	userCache domain.UserCache,
 ) (*Services, error) {
-	userPositionService, err := NewUserPositionService(repos.UserPosition, placesClient, authClient, bigqueryClient)
+	userPositionService, err := NewUserPositionService(repos.UserPosition, placesClient, authClient, bigqueryClient, userCache)
 	if err != nil {
 		return nil, err
 	}
