@@ -45,3 +45,7 @@ postgres:
 places:
   host: "places"
   port: 80
+
+auth:
+  host: "auth"
+  port: 50051

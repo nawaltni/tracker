@@ -1,47 +1,52 @@
-name: tracker
-replicas: 1
-
 deployment:
   image: tracker
   tag: 0.1.0
 
-ingress:
-  domain: nawalt.com
+name: tracker
 
-http:
-  port: 8080
-  servicePort: 80
+replicas: 2
 
 resources:
   requests:
-    memory: 50Mi
+    memory: 100Mi
     cpu: 50m
   limits:
-    memory: 100Mi
-    cpu: 100m
+    memory: 300Mi
+    cpu: 150m
 
-grpc:
-  host: "0.0.0.0"
-  port: 50051
-  servicePort: 80
+port: 8080
+
+servicePort: 80
 
 secret:
-  create: false
+  create: yes
   monitoring: "apps-metrics"
 
 env:
   config:
-    environment: development
+    environment: production
 
-postgres:
-  region: us-east1
-  instance: nawalt-prod
-  user: tracker
-  host: localhost
-  port: 5432
-  db: tracker
-  migrate: true
+grpc:
+  host: "0.0.0.0"
+  port: 50051
+  servicePort: 50051
+
+http:
+  host: "0.0.0.0"
+  port: 8080
+  servicePort: 80
 
 places:
   host: "places"
-  port: 80
+  port: 50051
+
+ingress:
+  domain: mtc.nawalt.com
+
+postgres:
+  host: nawalt-do-user-16514974-0.c.db.ondigitalocean.com
+  port: 25060
+  user: tracker
+  db: tracker
+  ssl: true
+  migrate: true

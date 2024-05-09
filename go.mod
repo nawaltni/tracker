@@ -8,7 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
-	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231214023645-f1cfd5bd9451
+	github.com/nawaltni/api/gen/go/nawalt v0.0.0-20240509022823-f818ebe075c9
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.8.0

@@ -33,9 +33,15 @@ type Config struct {
 	} `mapstructure:"grpc"`
 
 	Places Places `mapstructure:"places"`
+	Auth   Auth   `mapstructure:"auth"`
 }
 
 type Places struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
+}
+
+type Auth struct {
 	Host string `mapstructure:"host"`
 	Port int    `mapstructure:"port"`
 }

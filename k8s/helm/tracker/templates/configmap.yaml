@@ -14,4 +14,6 @@ data:
   postgresSSL: {{ .Values.postgres.ssl | quote }}
   placesHost: {{ .Values.places.host | quote }}
   placesPort: {{ .Values.places.port | quote }}
+  authHost: {{ .Values.auth.host | quote }}
+  authPort: {{ .Values.auth.port | quote }}
   

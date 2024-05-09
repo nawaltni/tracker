@@ -22,3 +22,7 @@ port = 8080
 [places]
 host = "localhost"
 port = 50052
+
+[auth]
+host = "localhost"
+port = 50053

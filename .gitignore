@@ -2,3 +2,5 @@ tracker
 !tracker/
 node_modules/
 secret/
+.env
+.envrc

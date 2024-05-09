@@ -234,8 +234,6 @@ github.com/google/s2a-go v0.1.7/go.mod h1:50CgR4k1jNlWBu4UfS4AcfhVe1r6pdZPygJ3R8
 github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 h1:El6M4kTTCOh6aBiKaUGG7oYTSPP8MxqL4YI3kZKwcP4=
 github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3pAXIBCelhxNneeOaAeabZDe5s4K6zSpQ=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/google/uuid v1.4.0 h1:MtMxsa51/r9yyhkyLsVeVt0B+BGQZzpQiTQ4eHZ8bc4=
-github.com/google/uuid v1.4.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/enterprise-certificate-proxy v0.3.2 h1:Vie5ybvEvT75RniqhfFxPRy3Bf7vr3h0cechB90XaQs=
@@ -324,6 +322,10 @@ github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjY
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231214023645-f1cfd5bd9451 h1:5O0L2HAWep30f+n6zdU6K7dYLvNoRuCORqw25pcXtIk=
 github.com/nawaltni/api/gen/go/nawalt v0.0.0-20231214023645-f1cfd5bd9451/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20240509014242-3a2c4a201c14 h1:iqDXjZBsx1yNamfMK8V7GMXk3mRqqL9uZysVXK3+I98=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20240509014242-3a2c4a201c14/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20240509022823-f818ebe075c9 h1:50X1/FlqR2McO//sAesxV/8UOszPYn3xIJpMu4+/5pk=
+github.com/nawaltni/api/gen/go/nawalt v0.0.0-20240509022823-f818ebe075c9/go.mod h1:eOc8cV5dgnKA6s/1n3iYz7AWdW494g81Z1GgavAY69M=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.0.2 h1:9yCKha/T5XdGtO0q9Q9a6T5NUCsTn/DrBg0D7ufOcFM=

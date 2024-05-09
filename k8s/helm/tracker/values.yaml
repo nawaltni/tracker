@@ -40,6 +40,10 @@ places:
   host: "places"
   port: 50051
 
+auth:
+  host: "auth"
+  port: 50051
+
 ingress:
   domain: dev.nawalt.com
 

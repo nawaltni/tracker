@@ -115,6 +115,16 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.name | quote }}
                   key: placesPort
+             - name: TRACKER_AUTH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.name | quote }}
+                  key: authHost
+            - name: TRACKER_AUTH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.name | quote }}
+                  key: authPort
       
       volumes:
         - name: tracker-gcloud-service-account

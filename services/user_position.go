@@ -13,6 +13,7 @@ import (
 type UserPositionService struct {
 	repo             domain.UserPositionRepository
 	placesClientGRPC domain.PlacesClientGRPC
+	authClientGRPC   domain.AuthClientGRPC
 	bigqueryClient   domain.BigqueryClient
 }
 
@@ -20,11 +21,13 @@ type UserPositionService struct {
 func NewUserPositionService(
 	repo domain.UserPositionRepository,
 	placesClient domain.PlacesClientGRPC,
+	authClient domain.AuthClientGRPC,
 	bigqueryClient domain.BigqueryClient,
 ) (*UserPositionService, error) {
 	return &UserPositionService{
 		repo:             repo,
 		placesClientGRPC: placesClient,
+		authClientGRPC:   authClient,
 		bigqueryClient:   bigqueryClient,
 	}, nil
 }

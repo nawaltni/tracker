@@ -81,6 +81,13 @@ func run(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	// 5. Create Auth Client
+	authClient, err := grpcClients.NewAuthClientGRPC(conf.Auth)
+	if err != nil {
+		log.Fatal("Failed to create auth grpc client: " + err.Error())
+		return
+	}
+
 	// 5. Create Bigquery Client
 	bigqueryClient, err := bigquery.NewClient("nawalt")
 	if err != nil {
@@ -89,7 +96,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// 6. Create Services
-	services, err := services.NewServices(*conf, repost, placesClient, bigqueryClient)
+	services, err := services.NewServices(*conf, repost, placesClient, authClient, bigqueryClient)
 	if err != nil {
 		log.Fatal("Failed to create services: " + err.Error())
 		return

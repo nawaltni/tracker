@@ -47,6 +47,10 @@ commit=$(git rev-parse --short HEAD)
 tstamp=$(date +"%Y%m%d%H%M%S")
 # combine vertion tag as commit tag and timestamp
 version="$commit-$tstamp"
+# if $1 NAMESPACE is not production, append the $1 to the version
+if [ "$1" != "production" ]; then
+    version="$version-$1"
+fi
 
 echo -e "\e[1;34mPreparing to Deploy to \e[33m$NAMESPACE\e[0m"
 IMAGE=registry.digitalocean.com/nawalt/tracker
@@ -61,7 +65,7 @@ echo -e "\e[1;31mWarning: This should only be used in an emergency.\e[0m"
 read -p "Are you sure you want to deploy from your computer?(y/n)" answer
 case ${answer:0:1} in
     y|Y )
-        DEPLOY_TOKEN=$(cat ~/.ssh/id_ed25519)
+        :
     ;;
     * )
         echo -e "\e[1;32mDeployment stopped\e[0m";
@@ -76,12 +80,12 @@ doctl kubernetes cluster kubeconfig save $K8S_CLUSTER -t $ACCESS_TOKEN
 
 # Setting up Docker config
 echo -e "\e[1;34mSetting up Docker config\e[0m"
-doctl registry login -t $ACCESS_TOKEN
+doctl registry login -t $ACCESS_TOKEN --expiry-seconds 300
 
 # build a container
 echo -e "\e[1;34mBuilding image\e[0m"
 
-build_command="docker build -t $IMAGE_NAME --build-arg DEPLOY_USER=\"$DEPLOY_USER\" --build-arg DEPLOY_TOKEN=\"$DEPLOY_TOKEN\" ."
+build_command="docker build --ssh -t $IMAGE_NAME --build-arg DEPLOY_USER=\"$DEPLOY_USER\" ."
 push_command="docker push $IMAGE_NAME"
 
 # Check architecture and adjust build command if necessary
