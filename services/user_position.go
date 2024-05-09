@@ -172,6 +172,7 @@ func (s *UserPositionService) GetUsersCurrentPositionByDate(ctx context.Context,
 		}
 
 		position[i].Name = user.Name
+		position[i].Role = user.Role
 	}
 
 	return position, nil
@@ -179,7 +180,26 @@ func (s *UserPositionService) GetUsersCurrentPositionByDate(ctx context.Context,
 
 // GetUsersCurrentPositionsSince retrieves a list of users' positions since a given time.
 func (s *UserPositionService) GetUsersCurrentPositionsSince(ctx context.Context, t time.Time) ([]domain.UserPosition, error) {
-	return s.repo.GetUsersCurrentPositionSince(ctx, t)
+	positions, err := s.repo.GetUsersCurrentPositionSince(ctx, t)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range positions {
+		backendID, err := strconv.Atoi(positions[i].BackendUserID)
+		if err != nil {
+			return nil, err
+		}
+		user, err := s.GetUserByBackendID(ctx, backendID)
+		if err != nil {
+			return nil, err
+		}
+
+		positions[i].Name = user.Name
+		positions[i].Role = user.Role
+	}
+
+	return positions, nil
 }
 
 // GetUserByBackendID retrieves a user by backend ID. It first checks the cache and then the auth service.

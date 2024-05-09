@@ -49,3 +49,7 @@ places:
 auth:
   host: "auth"
   port: 50051
+
+bigquery:
+  project_id: nawalt
+  dataset_id: staging

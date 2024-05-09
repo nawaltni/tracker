@@ -32,8 +32,9 @@ type Config struct {
 		Port int    `mapstructure:"port"`
 	} `mapstructure:"grpc"`
 
-	Places Places `mapstructure:"places"`
-	Auth   Auth   `mapstructure:"auth"`
+	Places   Places   `mapstructure:"places"`
+	Auth     Auth     `mapstructure:"auth"`
+	Bigquery Bigquery `mapstructure:"bigquery"`
 }
 
 type Places struct {
@@ -44,6 +45,11 @@ type Places struct {
 type Auth struct {
 	Host string `mapstructure:"host"`
 	Port int    `mapstructure:"port"`
+}
+
+type Bigquery struct {
+	ProjectID string `mapstructure:"project_id"`
+	DataSetID string `mapstructure:"dataset_id"`
 }
 
 // LoadConfig loads the configuration from file and environment variables

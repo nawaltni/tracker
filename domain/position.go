@@ -20,6 +20,7 @@ type UserPosition struct {
 	CheckedOut    *time.Time `json:"checked_out,omitempty"` // Optional, time when user checked out of a Place
 	PhoneMeta     PhoneMeta  `json:"phone_meta"`            // Metadata about the phone reporting the position
 	BackendUserID string     `json:"backend_user_id"`
+	Role          string     `json:"role"`
 }
 
 // CurrentUserPosition represents the current position of a user.

@@ -26,3 +26,7 @@ port = 50052
 [auth]
 host = "localhost"
 port = 50053
+
+[bigquery]
+project_id = "nawalt"
+dataset_id = "development"

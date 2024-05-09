@@ -93,7 +93,7 @@ func run(cmd *cobra.Command, args []string) {
 	userCache := cache.NewUserCache()
 
 	// 7. Create Bigquery Client
-	bigqueryClient, err := bigquery.NewClient("nawalt")
+	bigqueryClient, err := bigquery.NewClient(conf.Bigquery)
 	if err != nil {
 		log.Fatal("Failed to create bigquery client: " + err.Error())
 		return

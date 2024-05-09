@@ -16,4 +16,6 @@ data:
   placesPort: {{ .Values.places.port | quote }}
   authHost: {{ .Values.auth.host | quote }}
   authPort: {{ .Values.auth.port | quote }}
+  bigqueryProjectID: {{ .Values.bigquery.project_id | quote }}
+  bigqueryDatasetID: {{ .Values.bigquery.dataset_id | quote }}
   

@@ -115,7 +115,7 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.name | quote }}
                   key: placesPort
-             - name: TRACKER_AUTH_HOST
+            - name: TRACKER_AUTH_HOST
               valueFrom:
                 configMapKeyRef:
                   name: {{ .Values.name | quote }}
@@ -125,6 +125,16 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.name | quote }}
                   key: authPort
+            - name: TRACKER_BIGQUERY_PROJECT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.name | quote }}
+                  key: bigqueryProjectID
+            - name: TRACKER_BIGQUERY_DATASET_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.name | quote }}
+                  key: bigqueryDatasetID
       
       volumes:
         - name: tracker-gcloud-service-account

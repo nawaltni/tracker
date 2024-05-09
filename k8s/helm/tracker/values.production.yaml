@@ -19,7 +19,7 @@ port: 8080
 servicePort: 80
 
 secret:
-  create: false
+  create: true
   monitoring: "apps-metrics"
 
 env:
@@ -50,3 +50,7 @@ postgres:
   db: tracker
   ssl: true
   migrate: true
+
+bigquery:
+  project_id: nawalt
+  dataset_id: mtc
