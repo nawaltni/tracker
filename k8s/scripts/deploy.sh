@@ -9,12 +9,40 @@ if [[ -z "${ACCESS_TOKEN}" ]]; then
 	exit 1
 fi
 
+# Initialize variables
+postgresPassword=""
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        -p|--postgres-password)
+        postgresPassword="$2"
+        shift # past argument
+        shift # past value
+        ;;
+        development|staging|production)
+        ENVIRONMENT="$1"
+        shift # past argument
+        ;;
+        *)
+        echo "Invalid option: $1"
+        exit 1
+        ;;
+    esac
+done
+
+if [[ -z "$ENVIRONMENT" ]]; then
+    echo "Please specify the environment: development, staging, or production."
+    exit 1
+fi
+
 # Switch based on the environment parameter
-case "$1" in
+case "$ENVIRONMENT" in
     development)
-        NAMESPACE="dev"
-        PROJECT=nawalt-dev
-        K8S_CLUSTER=nawalt-dev
+        NAMESPACE="development"
+        PROJECT=nawalt
+        K8S_CLUSTER=nawalt
         K8S_ZONE=nyc1
         VALUES_FILE=values.yaml
         echo -e "\e[1;34mPreparing to Deploy to \e[33mDevelopment\e[0m"
@@ -41,6 +69,11 @@ case "$1" in
         ;;
 esac
 
+# Check if postgresPassword is provided
+if [ -z "$postgresPassword" ]; then
+    echo "Please provide the Postgres password using the --postgres-password flag."
+    exit 1
+fi
 
 # provide a version as an argument
 commit=$(git rev-parse --short HEAD)
@@ -48,8 +81,8 @@ tstamp=$(date +"%Y%m%d%H%M%S")
 # combine vertion tag as commit tag and timestamp
 version="$commit-$tstamp"
 # if $1 NAMESPACE is not production, append the $1 to the version
-if [ "$1" != "production" ]; then
-    version="$version-$1"
+if [ "$ENVIRONMENT" != "production" ]; then
+    version="$version-$ENVIRONMENT"
 fi
 
 echo -e "\e[1;34mPreparing to Deploy to \e[33m$NAMESPACE\e[0m"
@@ -118,6 +151,7 @@ helm upgrade --install \
     --values k8s/helm/tracker/$VALUES_FILE \
     --set deployment.image=$IMAGE \
     --set deployment.tag=$version \
+    --set secret.postgresPassword=$postgresPassword \
     tracker ./k8s/helm/tracker \
     -n $NAMESPACE
 echo -e "\e[1;32mtracker deployed\e[0m"

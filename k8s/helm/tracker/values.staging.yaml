@@ -28,6 +28,7 @@ grpc:
 secret:
   create: false
   monitoring: "apps-metrics"
+  postgresPassword: "" # inject from cmd --set secret.postgresPassword=
 
 env:
   config:

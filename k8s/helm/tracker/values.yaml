@@ -21,6 +21,7 @@ servicePort: 80
 secret:
   create: yes
   monitoring: "apps-metrics"
+  postgresPassword: "" # inject from cmd --set secret.postgresPassword=
 
 env:
   config:
@@ -48,7 +49,7 @@ ingress:
   domain: dev.nawalt.com
 
 postgres:
-  host: nawalt-dev-do-user-1811587-0.c.db.ondigitalocean.com
+  host: nawalt-dev-do-user-16514974-0.c.db.ondigitalocean.com
   port: 25060
   user: tracker
   db: tracker
