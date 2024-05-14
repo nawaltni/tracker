@@ -43,9 +43,11 @@ func (c *Client) RecordUserPosition(ctx context.Context, userPosition domain.Use
 	return nil
 }
 
-// GetUserPositionsSince retrieves a user's positions from bigquery since a given time
-func (c *Client) GetUserPositionsSince(ctx context.Context, userID string, t time.Time) ([]domain.UserPosition, error) {
-	q := c.client.Query(fmt.Sprintf("SELECT * FROM `%s.users-position` WHERE user_id = '%s' AND created_at >= '%s'", c.config.DataSetID, userID, t.Format("2006-01-02 15:04:05")))
+// GetUserPositionsHistorySince retrieves a user's positions from bigquery since a given time
+func (c *Client) GetUserPositionsHistorySince(ctx context.Context, userID string, t time.Time, limit int) ([]domain.UserPosition, error) {
+	q := c.client.Query(
+		fmt.Sprintf("SELECT * FROM `%s.users-position` WHERE user_id = '%s' AND created_at >= '%s' LIMIT %d",
+			c.config.DataSetID, userID, t.Format("2006-01-02 15:04:05"), limit))
 	it, err := q.Read(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving user position: %w", err)

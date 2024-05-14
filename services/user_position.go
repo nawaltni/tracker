@@ -219,3 +219,8 @@ func (s *UserPositionService) GetUserByBackendID(ctx context.Context, id int) (*
 
 	return user, nil
 }
+
+// GetUserPositionHistorySince retrieves a user's position history since a given time.
+func (s *UserPositionService) GetUserPositionHistorySince(ctx context.Context, userID string, t time.Time, limit int) ([]domain.UserPosition, error) {
+	return s.bigqueryClient.GetUserPositionsHistorySince(ctx, userID, t, limit)
+}

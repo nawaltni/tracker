@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -143,4 +144,27 @@ func mapToUserPositionBatchResponse(m map[string]string) []UserPositionBatchResp
 		return s[i].RefID < s[j].RefID
 	})
 	return s
+}
+
+// GetUserPositionsHistorySince returns the user's position history since a given time.
+func (a *API) GetUserPositionsHistorySince(c *gin.Context) {
+	userID := c.Param("id")
+	t, err := time.Parse(time.RFC3339, c.Query("since"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid time format"})
+		return
+	}
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 10
+	}
+
+	positions, err := a.services.UserPositionService.GetUserPositionHistorySince(c, userID, t, limit)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user positions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, positions)
 }

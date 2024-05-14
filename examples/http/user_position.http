@@ -38,3 +38,7 @@ POST https://mtc.nawalt.com/api/tracker/users/position/batch
         "userId": "2"
     }
 ]
+
+###
+
+GET http://localhost:8080/users/7bc2176e-e888-4a2e-ad7f-0b89473a4cad/position/history?since=2024-05-13T01:02:49Z&limit=200

@@ -19,8 +19,8 @@ type UserPosition struct {
 	CheckedIn     *time.Time `json:"checked_in,omitempty"`  // Optional, time when user checked into a Place
 	CheckedOut    *time.Time `json:"checked_out,omitempty"` // Optional, time when user checked out of a Place
 	PhoneMeta     PhoneMeta  `json:"phone_meta"`            // Metadata about the phone reporting the position
-	BackendUserID string     `json:"backend_user_id"`
-	Role          string     `json:"role"`
+	BackendUserID string     `json:"backend_user_id,omitempty"`
+	Role          string     `json:"role,omitempty"`
 }
 
 // CurrentUserPosition represents the current position of a user.
@@ -49,4 +49,5 @@ type UserPositionService interface {
 	GetUsersCurrentPositionByCoordinates(ctx context.Context, lat float32, lon float32, distance int) ([]UserPosition, error)
 	GetUsersCurrentPositionByDate(ctx context.Context, date time.Time) ([]UserPosition, error)
 	GetUsersCurrentPositionsSince(ctx context.Context, t time.Time) ([]UserPosition, error)
+	GetUserPositionHistorySince(ctx context.Context, userID string, t time.Time, limit int) ([]UserPosition, error)
 }
