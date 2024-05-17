@@ -64,6 +64,7 @@ func New(conf *config.Config, svcs *services.Services) *API {
 		})
 	}
 	r.Use(gin.Recovery())
+	r.Use(corsMiddleware())
 
 	// This condition has been implemented to avoid that the ginprom
 	// configuration loads more than once inside the unit tests
@@ -116,5 +117,20 @@ func (api *API) Router() *gin.Engine {
 func (api *API) Health() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Status(http.StatusOK)
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
 }
