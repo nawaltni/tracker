@@ -89,6 +89,7 @@ func New(conf *config.Config, svcs *services.Services) *API {
 	r.POST("/users/position/batch", api.RecordPositionBatch)
 	r.GET("/users/:id/position/history", api.GetUserPositionsHistorySince)
 	r.GET("/ws", api.ws)
+	r.GET("/ping", api.Ping)
 
 	api.router = r
 

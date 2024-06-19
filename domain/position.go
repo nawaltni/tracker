@@ -21,6 +21,8 @@ type UserPosition struct {
 	PhoneMeta     PhoneMeta  `json:"phone_meta"`            // Metadata about the phone reporting the position
 	BackendUserID string     `json:"backend_user_id,omitempty"`
 	Role          string     `json:"role,omitempty"`
+	ClientID      string     `json:"client_id,omitempty"`
+	ClientName    string     `json:"client_name,omitempty"`
 }
 
 // CurrentUserPosition represents the current position of a user.

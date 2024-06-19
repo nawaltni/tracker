@@ -70,6 +70,7 @@ func (s *UserPositionService) RecordPosition(ctx context.Context, userPosition d
 
 		userPosition.BackendUserID = userPosition.UserID
 		userPosition.UserID = user.ID
+		userPosition.Name = user.Name
 
 	} else {
 		// Now we will call the GetCurrentUserPosition to know the previous position of the user.

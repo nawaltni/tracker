@@ -5,6 +5,7 @@ metadata:
   labels:
     app: "{{ .Values.name }}"
     monitor: "true"
+
 spec:
   type: NodePort
   ports:

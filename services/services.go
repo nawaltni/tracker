@@ -9,6 +9,7 @@ import (
 // Services contains all services of the application
 type Services struct {
 	UserPositionService domain.UserPositionService
+	
 	Config              config.Config
 }
 
